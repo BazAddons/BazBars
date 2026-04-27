@@ -1,7 +1,7 @@
 -- BazBars MacroText Action Handler
 -- Custom user-written macrotext created via the in-addon macrotext editor.
 -- Unlike all other handlers, MacroText actions don't come from a WoW cursor
--- drag — they're placed directly by the editor. Because there's no natural
+-- drag - they're placed directly by the editor. Because there's no natural
 -- way to represent custom macrotext on the WoW cursor, these buttons can't
 -- currently be shift-dragged between BazBars; you edit a button's macrotext
 -- in place with the editor.
@@ -38,7 +38,7 @@ local MacroText = {
 }
 
 ---------------------------------------------------------------------------
--- Cursor — not applicable
+-- Cursor - not applicable
 -- Custom macrotext never exists on the WoW cursor, so fromCursor is a no-op
 -- and pickup does nothing. Swap support would require an internal state
 -- system and is deferred.
@@ -115,7 +115,7 @@ function MacroText.showTooltip(data)
         return
     end
 
-    -- No #showtooltip — show the first line of the macrotext as a hint
+    -- No #showtooltip - show the first line of the macrotext as a hint
     local firstLine = data.body:match("^([^\n]+)")
     GameTooltip:SetText(firstLine or "Macro", 1, 1, 1)
 end
@@ -137,7 +137,7 @@ end
 -- Legacy migration
 -- Legacy buttons could have macrotext set as an override on top of any
 -- command type (spell/item/etc). We only claim entries where the macrotext
--- is "custom" — i.e., it doesn't match the native body of the underlying
+-- is "custom" - i.e., it doesn't match the native body of the underlying
 -- Blizzard macro. For legacy entries where command="macro" AND macrotext
 -- matches the Blizzard macro body, the Macro handler claims it (Macro
 -- priority 70 > MacroText priority 20, so Macro runs first).

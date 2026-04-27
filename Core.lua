@@ -181,7 +181,7 @@ end
 -- If the player has "cast on key down" enabled, dragging BazBars buttons
 -- would also fire the cast (mousedown triggers the secure click before drag
 -- can start). BazBars buttons always register for mouseup, so they work
--- correctly regardless — but the user may see inconsistent behavior between
+-- correctly regardless - but the user may see inconsistent behavior between
 -- their Blizzard bars and BazBars. Offer to change the CVar on first run.
 ---------------------------------------------------------------------------
 
@@ -217,7 +217,7 @@ end
 addon.config.onReady = function(self)
     self.Bar:LoadAll()
 
-    -- Targeted updates — only run the sub-update each event actually
+    -- Targeted updates - only run the sub-update each event actually
     -- needs, instead of the full 8-function UpdateButton for every
     -- button on every event. High-frequency combat events like
     -- SPELL_UPDATE_COOLDOWN can fire dozens of times per second in
@@ -230,12 +230,12 @@ addon.config.onReady = function(self)
     self:On("UPDATE_MACROS",        function() addon:UpdateAllMacroNames() end)
     self:On("PLAYER_TARGET_CHANGED", function() addon:OnRangeEvent() end)
 
-    -- These are infrequent events — a full update pass is fine.
+    -- These are infrequent events - a full update pass is fine.
     self:On("BAG_UPDATE",               function() addon:QueueFullUpdate() end)
     self:On("PLAYER_EQUIPMENT_CHANGED", function() addon:QueueFullUpdate() end)
     self:On("ACTIONBAR_UPDATE_STATE",   function() addon:QueueFullUpdate() end)
 
-    -- Pause the range ticker when not in combat — no reason to poll
+    -- Pause the range ticker when not in combat - no reason to poll
     -- spell range every 0.2s while standing in town.
     self:On("PLAYER_REGEN_DISABLED", function() addon:StartRangeTicker() end)
     self:On("PLAYER_REGEN_ENABLED",  function() addon:StopRangeTicker() end)
@@ -382,13 +382,13 @@ local function ForEachButton(fn)
     end
 end
 
--- Full update — walks every button through all 8 sub-updates.
+-- Full update - walks every button through all 8 sub-updates.
 -- Used at startup, profile change, and rare events (BAG_UPDATE, etc.).
 function addon:UpdateAllButtons()
     ForEachButton(function(btn) self.Button:UpdateButton(btn) end)
 end
 
--- Targeted update helpers — each walks the button grid but only runs
+-- Targeted update helpers - each walks the button grid but only runs
 -- the one sub-update that the triggering event actually needs.
 function addon:UpdateAllCooldowns()
     ForEachButton(function(btn) self.Button:UpdateCooldown(btn) end)
@@ -411,7 +411,7 @@ function addon:OnRangeEvent()
 end
 
 ---------------------------------------------------------------------------
--- Coalesced full update — infrequent events (BAG_UPDATE, equip change,
+-- Coalesced full update - infrequent events (BAG_UPDATE, equip change,
 -- action bar state) may fire in rapid bursts (e.g. swapping a gear set
 -- triggers one PLAYER_EQUIPMENT_CHANGED per slot). Instead of doing a
 -- full update pass per event, set a dirty flag and flush once at the
@@ -434,7 +434,7 @@ function addon:QueueFullUpdate()
 end
 
 ---------------------------------------------------------------------------
--- Range ticker — polls spell range every 0.2s, but only while in
+-- Range ticker - polls spell range every 0.2s, but only while in
 -- combat. Out-of-combat there's no target switching that matters for
 -- range coloring, and the 5-times-per-second loop over every button
 -- was burning CPU for no reason.

@@ -20,7 +20,7 @@ local function GetSetIcon(setID)
     return icon
 end
 
--- Legacy support: sets used to be stored by name. Resolve name → setID.
+-- Legacy support: sets used to be stored by name. Resolve name > setID.
 local function GetSetIDByName(name)
     if not name then return nil end
     local ids = C_EquipmentSet.GetEquipmentSetIDs()
@@ -49,7 +49,7 @@ local EquipmentSet = {
 function EquipmentSet.fromCursor()
     local cType, setName, _, setID = GetCursorInfo()
     if cType ~= "equipmentset" then return end
-    -- GetCursorInfo returns (type, name, ?, setID) for equipmentset — prefer
+    -- GetCursorInfo returns (type, name, ?, setID) for equipmentset - prefer
     -- the numeric ID, but fall back to resolving by name if needed.
     if type(setID) == "number" then
         return { id = setID }

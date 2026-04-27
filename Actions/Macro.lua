@@ -136,7 +136,7 @@ end
 
 function Macro.deserialize(saved)
     if not saved or not saved.name then return nil end
-    -- Don't reject missing macros — the user may have the macro on another
+    -- Don't reject missing macros - the user may have the macro on another
     -- character and the button should still exist (showing ? until the
     -- macro is available).
     return { name = saved.name }
@@ -155,7 +155,7 @@ function Macro.migrate(legacy)
 
     local name = legacy.value
     if type(name) == "number" then
-        name = GetMacroInfo(name) -- legacy index → name
+        name = GetMacroInfo(name) -- legacy index > name
     end
     if type(name) ~= "string" or name == "" then return nil end
 

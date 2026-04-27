@@ -77,13 +77,13 @@ function Bar:CreateSingleButton(frame, barData, r, c)
     -- AnyUp + the two main-button down events means the secure
     -- dispatcher fires correctly in both modes of the global
     -- `ActionButtonUseKeyDown` CVar:
-    --   CVar=0 → dispatch on key-up, drag-drop works on plain click-drag
+    --   CVar=0 > dispatch on key-up, drag-drop works on plain click-drag
     --            (the mouseup is consumed by the active drag so the
     --            secure cast is never triggered)
-    --   CVar=1 → dispatch on LeftButton/RightButton down, matching
+    --   CVar=1 > dispatch on LeftButton/RightButton down, matching
     --            Blizzard's default bars. Plain click-drag would fire
     --            the spell before the drag started, so Shift+drag is
-    --            required to pick up buttons — shift-type1/shift-type2
+    --            required to pick up buttons - shift-type1/shift-type2
     --            are set to "noop" in Registry.lua so shift-click /
     --            shift-drag never dispatches anything.
     btn:RegisterForClicks("AnyUp", "LeftButtonDown", "RightButtonDown")
@@ -109,7 +109,7 @@ function Bar:CreateSingleButton(frame, barData, r, c)
 
         self._bazStashedType = nil
 
-        -- If cursor has contents, this was a drop attempt — handle it
+        -- If cursor has contents, this was a drop attempt - handle it
         if GetCursorInfo() then
             addon.Button:ReceiveDrag(self)
         end

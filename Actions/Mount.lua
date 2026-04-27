@@ -72,7 +72,7 @@ function Mount.fromCursor()
             pickedUpMountID = nil
             return data
         end
-        -- No cache — we can't reliably map id1 to a mountID, give up.
+        -- No cache - we can't reliably map id1 to a mountID, give up.
         return nil
     end
 
@@ -95,7 +95,7 @@ function Mount.fromCursor()
         end
     end
 
-    -- Cursor is empty or has something unrelated — clear the cache
+    -- Cursor is empty or has something unrelated - clear the cache
     if not cType then
         pickedUpMountID = nil
     end

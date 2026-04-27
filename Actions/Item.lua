@@ -37,7 +37,7 @@ local Item = {
 function Item.fromCursor()
     local cType, itemID = GetCursorInfo()
     if cType ~= "item" or not itemID then return end
-    -- Skip toys — they have cursor type "item" but must be cast by name.
+    -- Skip toys - they have cursor type "item" but must be cast by name.
     -- Leave them for the Toy handler (when registered) or the legacy path.
     if PlayerHasToy and PlayerHasToy(itemID) then return end
     return { id = itemID }
@@ -114,7 +114,7 @@ end
 function Item.deserialize(saved)
     if not saved or not saved.id then return nil end
     -- Items can be unknown when the user hasn't loaded them yet (not in
-    -- bags, not encountered). We DON'T reject here — the cache will fill
+    -- bags, not encountered). We DON'T reject here - the cache will fill
     -- in eventually and the button will just show ? until it does.
     return { id = saved.id }
 end

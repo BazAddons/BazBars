@@ -1,6 +1,6 @@
 -- BazBars Spell Action Handler
 -- Handles spells picked up from the spellbook. Covers regular spells, flyout
--- spells, and profession spells — they're all just "spell" to WoW's cursor.
+-- spells, and profession spells - they're all just "spell" to WoW's cursor.
 
 local Actions = BazBars.Actions
 
@@ -20,7 +20,7 @@ end
 -- values that can't be compared to numeric literals directly; round-trip
 -- through string.format to strip the taint. IMPORTANT: use "%f" not
 -- "%d" so sub-second values (hasted GCDs like 0.75s) don't truncate to
--- zero — that truncation was silently killing the cooldown animation
+-- zero - that truncation was silently killing the cooldown animation
 -- on spells in combat.
 local function SafeNumber(n)
     if n == nil then return nil end
@@ -100,11 +100,11 @@ function Spell.getCount(data)
     return ""
 end
 
--- Preferred cooldown path — applies the cooldown to the Cooldown frame
+-- Preferred cooldown path - applies the cooldown to the Cooldown frame
 -- directly via Midnight's `SetCooldownFromDurationObject`, which takes
 -- a taint-safe duration object from `C_Spell.GetSpellCooldownDuration`
 -- instead of raw startTime/duration numbers. The duration-object API
--- is the only path that reliably shows cooldown sweeps in combat —
+-- is the only path that reliably shows cooldown sweeps in combat -
 -- the raw-numbers path (`C_Spell.GetSpellCooldown` + manual taint
 -- stripping) silently fails in the secure environment even when the
 -- numbers look correct.
@@ -182,7 +182,7 @@ function Spell.migrate(legacy)
         return { id = id }
     end
 
-    -- Fallback: resolve name → id
+    -- Fallback: resolve name > id
     if legacy.value then
         local info = C_Spell.GetSpellInfo(legacy.value)
         if info and info.spellID then

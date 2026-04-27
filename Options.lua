@@ -421,7 +421,7 @@ local function GetGlobalOptionsTable()
 end
 
 function Options:Setup()
-    -- Parent category — addon info and quick guide
+    -- Parent category - addon info and quick guide
     BazCore:RegisterOptionsTable("BazBars", function()
         return BazCore:CreateLandingPage("BazBars", {
             subtitle = "Custom extra action bars",

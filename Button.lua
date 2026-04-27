@@ -25,7 +25,7 @@ local QUESTION_MARK = "Interface\\Icons\\INV_Misc_QuestionMark"
 -- Pristine Cooldown instance used to call SetCooldown/Clear through its
 -- unmodified metatable. Going through `btn.cooldown:SetCooldown(...)`
 -- dispatches via the individual frame's (potentially tainted) method
--- table — in combat that taint path can make SetCooldown silently
+-- table - in combat that taint path can make SetCooldown silently
 -- no-op, which is why our cooldown animations were missing during
 -- combat. Using the prototype's method directly bypasses that.
 -- Same pattern as Blizzard's ActionButton (Blizzard_ActionBar/Shared/

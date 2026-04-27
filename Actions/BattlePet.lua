@@ -99,7 +99,7 @@ end
 
 function BattlePet.deserialize(saved)
     if not saved or not saved.id then return nil end
-    -- Don't reject — the pet might be on another character; just show the
+    -- Don't reject - the pet might be on another character; just show the
     -- button and let the cast fail at runtime if it's truly gone.
     return { id = saved.id }
 end

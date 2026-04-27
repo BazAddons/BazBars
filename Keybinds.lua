@@ -49,7 +49,7 @@ end
 -- bound a key (say `E`) to a Blizzard action, and then binds the same
 -- key to a BazBars button via Quick Keybind Mode, BOTH bindings end up
 -- on the key. The override wins (priority = true) so only the BazBars
--- click fires, but the Blizzard binding stays "attached" — it shows up
+-- click fires, but the Blizzard binding stays "attached" - it shows up
 -- in the Blizzard Key Bindings menu and reactivates if the BazBars
 -- binding is ever cleared.
 --
@@ -63,7 +63,7 @@ local function EvictBlizzardBindingNow(key)
     if not key or key == "" then return nil end
     local existing = GetBindingAction(key)
     if not existing or existing == "" then return nil end
-    -- Ignore bindings that already point at our own click owner —
+    -- Ignore bindings that already point at our own click owner -
     -- those are BazBars bindings, not Blizzard ones, and will be
     -- cleaned up by SetOverrideBindingClick itself.
     if existing:match("^CLICK BazBars") then return nil end
@@ -112,7 +112,7 @@ function Keybinds:SetBinding(buttonName, key)
 
     -- Clear any existing binding for this button. Use SetOverrideBinding
     -- (not SetOverrideBindingClick) because the click variant doesn't
-    -- accept nil for buttonName in Midnight — it errors out. The generic
+    -- accept nil for buttonName in Midnight - it errors out. The generic
     -- SetOverrideBinding with command=nil clears the override for that
     -- specific key, and works for click-overrides too.
     local oldKey = addon.db.profile.keybinds and addon.db.profile.keybinds[buttonName]
@@ -139,7 +139,7 @@ function Keybinds:SetBinding(buttonName, key)
     -- the override, so we don't end up in the silent-double-binding state
     -- where BazBars fires the click but Blizzard's menu still shows the
     -- key as bound to something else. If we're in combat the eviction is
-    -- deferred until PLAYER_REGEN_ENABLED — the override still takes
+    -- deferred until PLAYER_REGEN_ENABLED - the override still takes
     -- priority immediately via priority=true, so the BazBars click wins
     -- until the Blizzard clear catches up.
     local evictedAction
@@ -328,7 +328,7 @@ local function CreateKeybindFrame()
     end)
 
     -- Mouse button binding (middle mouse, mouse4, mouse5, etc.).
-    -- OnKeyDown only fires for keyboard keys — mouse buttons need
+    -- OnKeyDown only fires for keyboard keys - mouse buttons need
     -- OnMouseDown on the hovered BazBars button itself, handled in
     -- EnterMode below where we override button scripts.
 
@@ -379,7 +379,7 @@ function Keybinds:EnterMode()
                     btn.bbOldOnMouseDown = btn:GetScript("OnMouseDown")
 
                     -- Catch mouse button bindings (MiddleButton, Button4, Button5)
-                    -- OnKeyDown only fires for keyboard keys — mouse buttons
+                    -- OnKeyDown only fires for keyboard keys - mouse buttons
                     -- need OnMouseDown on the button itself.
                     --
                     -- IMPORTANT: OnMouseDown gives names like "MiddleButton"
