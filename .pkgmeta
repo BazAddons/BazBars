@@ -4,3 +4,10 @@ ignore:
   - .gitignore
   - .pkgmeta
   - LICENSE
+  # Marketing images live in the repo root so the README + CurseForge
+  # description can link to them via raw.githubusercontent.com URLs.
+  # They have no business in the in-game install - the BigWigsMods
+  # packager bundles every non-ignored file by default, so without
+  # these exclusions the ZIP balloons to ~8 MB on every release.
+  - logo.png
+  - screenshot.png
