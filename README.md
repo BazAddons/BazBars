@@ -187,11 +187,10 @@ Search for **BazBars** in your addon manager of choice. BazCore will be installe
 
 | | |
 |---|---|
-| **WoW Version** | Retail 12.0.1 (Midnight) |
-| **API Safety** | Midnight-compatible (`SetCooldownFromDurationObject`, direct button `OnEvent` handlers) |
-| **Masque** | Full support with per-bar skinning groups |
+| **WoW Version** | Retail 12.0 (Midnight) |
+| **Masque** | Full support — each bar can have its own Masque skin |
 | **Edit Mode** | Native integration with snapping, selection sync, and grid alignment |
-| **Combat** | Secure actions via `SecureActionButtonTemplate` |
+| **Combat** | Buttons are secure-action — they cast in combat just like Blizzard's |
 
 ---
 
