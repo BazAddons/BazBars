@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Button Module
 -- Creates action buttons, dispatches cursor/drag/click events to action
 -- handlers (Actions/*.lua), and updates visuals (texture, cooldown, range,

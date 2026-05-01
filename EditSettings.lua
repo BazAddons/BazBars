@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Edit Mode Settings Popup
 -- Matches Blizzard's EditModeSystemSettingsDialog visual style
 

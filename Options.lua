@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Options Module
 -- Now powered by BazCore OptionsPanel
 

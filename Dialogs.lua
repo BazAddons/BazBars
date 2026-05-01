@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Dialogs
 -- Macrotext editor, export/import dialogs (extracted from EditSettings)
 

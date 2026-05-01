@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Macro Action Handler
 -- Blizzard macros dragged from the macro UI. Stored by name (stable across
 -- reorder/delete) and resolved to a live index/body at runtime. Custom

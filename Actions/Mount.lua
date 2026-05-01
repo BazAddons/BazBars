@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Mount Action Handler
 -- Mounts from the mount journal. The cursor type is "mount" (older WoW
 -- versions used "companion" which we normalize). Secure casting uses a

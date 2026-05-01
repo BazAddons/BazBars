@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars BattlePet Action Handler
 -- Battle pets from the pet journal. Cursor type is "battlepet" and the
 -- identifier is the pet's GUID (a string). Secure casting uses a

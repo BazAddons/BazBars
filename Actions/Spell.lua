@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Spell Action Handler
 -- Handles spells picked up from the spellbook. Covers regular spells, flyout
 -- spells, and profession spells - they're all just "spell" to WoW's cursor.

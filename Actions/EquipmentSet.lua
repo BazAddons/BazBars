@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars EquipmentSet Action Handler
 -- Equipment sets from the character equipment manager. Stored by setID
 -- (stable across renames) and cast via "/equipset <name>" macro.

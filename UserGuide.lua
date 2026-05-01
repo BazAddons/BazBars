@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 ---------------------------------------------------------------------------
 -- BazBars User Guide
 -- Registered with BazCore so it appears in the User Manual tab.

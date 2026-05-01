@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Item Action Handler
 -- Handles bag items. Toys are a separate handler (Actions/Toy.lua) with
 -- higher priority so it intercepts items that are actually toys before this

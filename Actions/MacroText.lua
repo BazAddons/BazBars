@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars MacroText Action Handler
 -- Custom user-written macrotext created via the in-addon macrotext editor.
 -- Unlike all other handlers, MacroText actions don't come from a WoW cursor

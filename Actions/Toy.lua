@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Toy Action Handler
 -- Toys appear as "item" on the cursor, same as bag items. We detect them via
 -- C_ToyBox.GetToyInfo and take priority OVER the Item handler so regular

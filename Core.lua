@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Core Module
 -- Addon lifecycle, slash commands, Edit Mode integration
 -- Powered by BazCore framework

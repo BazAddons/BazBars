@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Quick Keybind Mode
 -- Hover a button, press a key to bind it
 

@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Actions Registry
 -- Central registry for action handlers. Each handler knows everything about
 -- one action type (spell, item, macro, mount, etc.) in a self-contained module.

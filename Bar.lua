@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Bar Module
 -- Handles bar creation, layout, Edit Mode dragging, and visual presentation
 

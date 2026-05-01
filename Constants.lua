@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazBars Constants and Defaults
 
 BazBars = BazBars or {}
