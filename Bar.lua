@@ -375,8 +375,21 @@ function Bar:RegisterEditMode(frame, barData)
                 end
             end },
             { label = "|cffff4444Delete This Bar|r", onClick = function()
-                BazCore:DeselectEditFrame(frame)
-                addon:DeleteBar(bd.id)
+                -- Same confirm UX as the Options-page Delete button
+                -- (which uses confirm=true on its execute opt). One
+                -- click here used to wipe the bar with no undo.
+                if BazCore.Confirm then
+                    BazCore:Confirm({
+                        title       = "Delete bar?",
+                        body        = "Delete Bar " .. tostring(bd.id) .. "? This removes the bar and every button on it. Can't be undone.",
+                        acceptLabel = "Delete",
+                        acceptStyle = "destructive",
+                        onAccept    = function()
+                            BazCore:DeselectEditFrame(frame)
+                            addon:DeleteBar(bd.id)
+                        end,
+                    })
+                end
             end },
         },
 

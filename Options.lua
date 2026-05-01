@@ -269,8 +269,12 @@ BuildBarOptions = function(id, barData)
                 order = 100,
                 type = "execute",
                 name = "|cffff4444Delete This Bar|r",
-                confirm = true,
-                confirmText = "Are you sure you want to delete Bar " .. id .. "?",
+                confirm        = true,
+                confirmTitle   = "Delete bar?",
+                confirmText    = "Delete Bar " .. id .. "? This removes the bar and every button on it. Can't be undone.",
+                confirmStyle   = "destructive",
+                confirmAcceptLabel = "Delete",
+                confirmCancelLabel = "Cancel",
                 func = function()
                     addon:DeleteBar(id)
                 end,

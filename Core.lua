@@ -185,25 +185,6 @@ end
 -- their Blizzard bars and BazBars. Offer to change the CVar on first run.
 ---------------------------------------------------------------------------
 
-StaticPopupDialogs["BAZBARS_KEYDOWN_WARNING"] = {
-    text = "|cff3399ffBazBars|r works best with |cffffffffCast on key up|r enabled. " ..
-        "This is a global game setting and also matches Blizzard's default.\n\n" ..
-        "You currently have |cffff7f00Cast on key down|r enabled. BazBars buttons " ..
-        "still work correctly, but your Blizzard action bars will feel slightly " ..
-        "different from BazBars.\n\n" ..
-        "Change the setting to |cffffffffCast on key up|r now?",
-    button1 = "Yes, change it",
-    button2 = "Keep my setting",
-    OnAccept = function()
-        SetCVar("ActionButtonUseKeyDown", "0")
-        print("|cff3399ff[BazBars]|r Cast on key up enabled.")
-    end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3,
-}
-
 local function MaybeShowKeyDownWarning()
     if addon.db.profile.keyDownWarningShown then return end
     if not GetCVarBool("ActionButtonUseKeyDown") then
@@ -211,7 +192,19 @@ local function MaybeShowKeyDownWarning()
         return
     end
     addon.db.profile.keyDownWarningShown = true
-    StaticPopup_Show("BAZBARS_KEYDOWN_WARNING")
+    if BazCore.Confirm then
+        BazCore:Confirm({
+            title       = "BazBars: Cast on key up?",
+            body        = "BazBars works best with |cffffffffCast on key up|r enabled - the global game setting that also matches Blizzard's default.\n\nYou currently have |cffff7f00Cast on key down|r enabled. BazBars buttons still work correctly, but your Blizzard action bars will feel slightly different from BazBars.\n\nChange the setting to |cffffffffCast on key up|r now?",
+            acceptLabel = "Yes, change it",
+            cancelLabel = "Keep my setting",
+            acceptStyle = "primary",
+            onAccept    = function()
+                SetCVar("ActionButtonUseKeyDown", "0")
+                print("|cff3399ff[BazBars]|r Cast on key up enabled.")
+            end,
+        })
+    end
 end
 
 addon.config.onReady = function(self)

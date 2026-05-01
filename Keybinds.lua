@@ -272,13 +272,26 @@ local function CreateKeybindFrame()
     defaultsBtn:SetPoint("BOTTOM", 0, 18)
     defaultsBtn:SetText("Reset To Default")
     defaultsBtn:SetScript("OnClick", function()
-        -- Clear all BazBars keybinds
-        if addon.db.profile.keybinds then
-            for buttonName, _ in pairs(addon.db.profile.keybinds) do
-                Keybinds:ClearBinding(buttonName)
-            end
+        -- Clearing every keybind is destructive - one click and a player's
+        -- entire personalised binding setup is gone with no undo. Gate
+        -- behind a confirm so an accidental click on the wrong button
+        -- doesn't wipe the whole table.
+        if BazCore.Confirm then
+            BazCore:Confirm({
+                title       = "Reset BazBars keybinds?",
+                body        = "Clear every custom BazBars keybind? Your bars revert to no bindings - you'll need to rebind every button you use. This can't be undone.",
+                acceptLabel = "Reset",
+                acceptStyle = "destructive",
+                onAccept    = function()
+                    if addon.db.profile.keybinds then
+                        for buttonName, _ in pairs(addon.db.profile.keybinds) do
+                            Keybinds:ClearBinding(buttonName)
+                        end
+                    end
+                    addon.db.profile.keybinds = {}
+                end,
+            })
         end
-        addon.db.profile.keybinds = {}
     end)
 
     local cancelBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
