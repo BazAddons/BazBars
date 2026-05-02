@@ -241,6 +241,37 @@ end
 -- Full button update (called on events)
 ---------------------------------------------------------------------------
 
+-- Render the small directional arrow overlay on flyout slots using
+-- Blizzard's own UI-HUD-ActionBar-Flyout atlas (the same texture
+-- Blizzard's action-bar flyouts use - confirmed via FrameXML's
+-- Blizzard_Flyout/Flyout.xml). The atlas's natural orientation is "UP";
+-- DOWN/LEFT/RIGHT rotate around the texture's center.
+local FLYOUT_ARROW_ATLAS = "UI-HUD-ActionBar-Flyout"
+local FLYOUT_ARROW_OFFSET = {
+    UP    = { "TOP",     0,   3,    0           },
+    DOWN  = { "BOTTOM",  0,  -3,    math.pi     },
+    LEFT  = { "LEFT",   -3,   0,    math.pi / 2 },
+    RIGHT = { "RIGHT",   3,   0,   -math.pi / 2 },
+}
+
+function Button:UpdateFlyoutArrow(btn)
+    local isFlyout = btn.action and btn.action.type == "flyout"
+    if not isFlyout then
+        if btn.bbFlyoutArrow then btn.bbFlyoutArrow:Hide() end
+        return
+    end
+    if not btn.bbFlyoutArrow then
+        btn.bbFlyoutArrow = btn:CreateTexture(nil, "OVERLAY")
+        btn.bbFlyoutArrow:SetAtlas(FLYOUT_ARROW_ATLAS, true)
+    end
+    local direction = (btn.action.data and btn.action.data.direction) or "UP"
+    local geom = FLYOUT_ARROW_OFFSET[direction] or FLYOUT_ARROW_OFFSET.UP
+    btn.bbFlyoutArrow:ClearAllPoints()
+    btn.bbFlyoutArrow:SetPoint(geom[1], btn, geom[1], geom[2], geom[3])
+    btn.bbFlyoutArrow:SetRotation(geom[4])
+    btn.bbFlyoutArrow:Show()
+end
+
 function Button:UpdateButton(btn)
     Button:UpdateTexture(btn)
     Button:UpdateCooldown(btn)
@@ -249,6 +280,7 @@ function Button:UpdateButton(btn)
     Button:UpdateGlow(btn)
     Button:UpdateEquipped(btn)
     Button:UpdateMacroName(btn)
+    Button:UpdateFlyoutArrow(btn)
 end
 
 ---------------------------------------------------------------------------
@@ -299,6 +331,15 @@ end
 
 -- Apply a handler-based action to a button.
 function Button:SetActionFromHandler(btn, handler, data)
+    -- If the slot was previously a flyout and the new action isn't,
+    -- tear down the popup + _onclick snippet so a stale right-click
+    -- toggle doesn't keep opening a dead popup.
+    if btn.action and btn.action.type == "flyout" and handler.type ~= "flyout" then
+        if addon.FlyoutPopup and addon.FlyoutPopup.DetachFrom then
+            addon.FlyoutPopup:DetachFrom(btn)
+        end
+    end
+
     btn.action = { type = handler.type, data = data }
 
     local selfCast = btn.bbBarData and btn.bbBarData.rightClickSelfCast
@@ -311,6 +352,11 @@ end
 function Button:ClearAction(btn)
     btn.action = nil
     BazBars.Actions:ClearButtonAttributes(btn)
+    -- Tear down any flyout popup wired to this slot so right-click
+    -- doesn't keep opening a stale grid after the slot is cleared.
+    if addon.FlyoutPopup and addon.FlyoutPopup.DetachFrom then
+        addon.FlyoutPopup:DetachFrom(btn)
+    end
     Button:UpdateButton(btn)
     Button:SaveButton(btn)
 end
@@ -408,11 +454,36 @@ end
 function BazBarsButton_PostClick(self, button)
     if InCombatLockdown() then return end
 
-    -- Shift+Right-Click clears the button
+    -- Shift+Right-Click is the standard "config / context" gesture
+    -- across BazCore addons:
+    --   * empty slot      -> spawn a default flyout (1x3, UP, lastUsed)
+    --   * flyout slot     -> open per-slot config (TODO: config popup)
+    --   * other filled    -> clear (legacy behaviour preserved)
     if button == "RightButton" and IsShiftKeyDown() then
-        if self.action then
-            Button:ClearAction(self)
+        if not self.action then
+            local Flyout = addon.FlyoutHandler
+            if Flyout then
+                local handler = BazBars.Actions:Get("flyout")
+                if handler then
+                    Button:SetActionFromHandler(self, handler,
+                        Flyout.MakeDefault({ rows = 1, cols = 3 }))
+                end
+            end
+            return
         end
+
+        if self.action.type == "flyout" then
+            -- Open the per-slot config form (rows / cols / direction /
+            -- mode / persist). Cell editing is still done by opening
+            -- the popup with a normal right-click and dropping spells
+            -- onto cells.
+            if addon.FlyoutPopup and addon.FlyoutPopup.OpenConfig then
+                addon.FlyoutPopup:OpenConfig(self)
+            end
+            return
+        end
+
+        Button:ClearAction(self)
         return
     end
 

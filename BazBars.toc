@@ -1,7 +1,7 @@
 ## Interface: 120005
 ## Title: BazBars
 ## Author: Baz4k
-## Version: 042
+## Version: 043
 ## Notes: Custom extra action bars - independent of standard action bars
 ## X-License: GPL v2
 ## X-Website: https://www.curseforge.com/wow/addons/bazbars
@@ -24,8 +24,10 @@ Actions\BattlePet.lua
 Actions\Macro.lua
 Actions\EquipmentSet.lua
 Actions\Item.lua
+Actions\Flyout.lua
 BazBars.xml
 Button.lua
+FlyoutPopup.lua
 Bar.lua
 Dialogs.lua
 Keybinds.lua

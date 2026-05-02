@@ -97,9 +97,22 @@ function Bar:CreateSingleButton(frame, barData, r, c)
     -- when the cursor has contents, the way Blizzard's action buttons do.
     -- We intercept the click: PreClick clears the type attribute to prevent
     -- the secure cast, and PostClick manually triggers the drop handling.
+    -- "Has something pending to drop" - real cursor contents OR a
+    -- BazBars-internal carry (currently just the flyout slot-to-slot
+    -- carrier; future addon-internal pickups can plug in via the same
+    -- handler-side HasPending hook).
+    local function HasIncomingDrop()
+        if GetCursorInfo() then return true end
+        local Flyout = addon.FlyoutHandler
+        if Flyout and Flyout.HasPending and Flyout.HasPending() then
+            return true
+        end
+        return false
+    end
+
     btn:HookScript("PreClick", function(self)
         if InCombatLockdown() then return end
-        if GetCursorInfo() then
+        if HasIncomingDrop() then
             self._bazStashedType = self:GetAttribute("type") or false
             self:SetAttribute("type", nil)
         end
@@ -110,8 +123,8 @@ function Bar:CreateSingleButton(frame, barData, r, c)
 
         self._bazStashedType = nil
 
-        -- If cursor has contents, this was a drop attempt - handle it
-        if GetCursorInfo() then
+        -- If a drop is waiting (real cursor or addon carry), handle it
+        if HasIncomingDrop() then
             addon.Button:ReceiveDrag(self)
         end
         -- ReceiveDrag (if it ran) will have reset the button's type attribute
