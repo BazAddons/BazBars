@@ -1,5 +1,13 @@
 # BazBars Changelog
 
+## 044 — User guide refresh
+
+The in-game User Manual was reorganised and brought up to date. New
+detail in Placing Buttons covers the Cast on Key Down gotcha (use Shift
++drag to rearrange when that mode is on). Quick Keybind section now
+documents the supported mouse buttons (middle, mouse4, mouse5) and the
+automatic Blizzard-binding eviction. Added a Profiles page.
+
 ## 043 - Custom flyouts on any slot
 
 Right-click any BazBars slot to pop out a small grid of action buttons.
