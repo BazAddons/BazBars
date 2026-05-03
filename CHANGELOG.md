@@ -1,18 +1,39 @@
 # BazBars Changelog
 
-## 043 - Custom flyouts (any slot, any action type)
-- **Flyouts**: any BazBars slot can now be a flyout — a configurable grid of cells that pops out from a single button. Cells accept everything bar slots accept: spells, items, mounts, toys, macros, battle pets, equipment sets. All routed through the same `BazBars.Actions` registry, so what works on a normal slot works in a flyout cell.
-- **Two creation paths**:
-  - Drag a class flyout from the spellbook (Mage Teleport, Warlock Demon Summons, etc.) onto an empty slot. The slot fills with the flyout's spells live; new variants you learn appear automatically.
-  - Shift+Right-Click an empty slot to spawn a default 1×3 flyout, then drop spells / mounts / items onto its cells.
-- **Gestures**: left-click slot casts the current cell, right-click toggles the popup, click a cell to cast it (and in Last-Used mode it becomes the slot's new current), drop on any cell to add/replace, drag a cell out to pick it up, click outside the popup to dismiss.
-- **Configuration form** (Shift+Right-Click a flyout slot): grid rows / cols (1–12 each), pop-out direction (UP/DOWN/LEFT/RIGHT), Left-click Mode (Last Used / Specific), persist current spell across sessions. The actual flyout opens in place behind the dialog and updates live as you adjust sliders — no in-popup mock preview, the real popup is the preview. Cancel restores; Apply saves.
-- **Move flyouts between slots**: Shift+Left-Drag a flyout slot to pick up the whole flyout. The slot clears and a follower icon (the slot's current icon) tracks your cursor. Drop on another BazBar slot to place it. Esc / click-empty-world cancels.
-- **Drops keep their position** — sparse cell array. Dropping on cell 5 lands at cell 5 even if cells 1–4 are empty.
-- **Native-flyout drop** auto-converts to a custom flyout pre-seeded with the same spells when you mutate any cell.
-- **Fallback handling**: if a pinned cell becomes unlearned, the slot falls back to the next usable cell. If all cells become unusable, the slot reverts to empty on next reload.
-- New `Actions/Flyout.lua` action handler + `FlyoutPopup.lua` thin wrapper around BazCore's new `SecureActionPopup` primitive.
-- User Guide updated with a new Flyouts page covering creation, gestures, configuration, and slot-to-slot moves.
+## 043 - Custom flyouts on any slot
+
+Right-click any BazBars slot to pop out a small grid of action buttons.
+Useful for grouping related abilities under one slot — teleports, tank
+trinkets, profession tools, whatever you want one click away without
+spending a whole row on it.
+
+**Two ways to make one.** Drag a class flyout (Mage Teleports, Warlock
+Summons, etc.) from your spellbook onto an empty slot for a live copy
+that updates as you learn new variants. Or Shift+right-click an empty
+slot for a blank 3-cell grid that you fill yourself by dragging in
+spells, items, mounts, toys, macros, battle pets, or equipment sets.
+
+**How it works.** Left-click the slot casts whatever's currently
+showing. Right-click toggles the grid open and closed. Click a cell to
+cast it. Drag a cell out to pick it up. Click outside the grid to close
+it.
+
+**Configure** by Shift+right-clicking an existing flyout slot. Pick the
+grid size (up to 12×12), which way it pops out (up, down, left, right),
+and whether the slot icon shows the last-used cell or a specific one
+you pin. The flyout opens live behind the config so you see your changes
+immediately. Cancel reverts; Apply saves.
+
+**Move flyouts between slots** with Shift+left-drag. A follower icon
+tracks your cursor — drop on another BazBars slot to relocate the whole
+flyout. Press Esc or click empty world to cancel.
+
+Drops always land where you put them — drop on cell 5 and it lands at
+cell 5 even if cells 1–4 are empty. If a pinned cell becomes unlearned,
+the slot falls back to the next usable cell.
+
+The User Guide has a new Flyouts page walking through creation,
+gestures, config, and slot moves.
 
 ## 030 - Mouse Button Keybinding Support
 - Quick Keybind Mode now supports **middle mouse, mouse4, and mouse5** bindings (and modifier combos like Shift+MiddleButton)
