@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bazsec/BazBars/master/logo.png" alt="BazBars Logo" width="300"/>
+  <img src="https://raw.githubusercontent.com/BazAddons/BazBars/master/logo.png" alt="BazBars Logo" width="300"/>
 </p>
 
 <h1 align="center">BazBars</h1>
@@ -10,9 +10,10 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Part_of-BazAddons-b8924a?labelColor=2a2519" alt="Part of the BazAddons suite"/>
   <img src="https://img.shields.io/badge/WoW-12.0%20Midnight-blue" alt="WoW Version"/>
   <img src="https://img.shields.io/badge/License-GPL%20v2-green" alt="License"/>
-  <img src="https://img.shields.io/github/v/tag/bazsec/BazBars?label=Version&color=orange" alt="Version"/>
+  <img src="https://img.shields.io/github/v/tag/BazAddons/BazBars?label=Version&color=orange" alt="Version"/>
 </p>
 
 > **Requires [BazCore](https://www.curseforge.com/wow/addons/bazcore)**
@@ -27,7 +28,7 @@ BazBars lets you create as many action bars as you need, with fully customizable
 Buttons look and feel identical to Blizzard's default action bars, using the same atlas textures, icon masks, cooldown animations, and proc glows. BazBars integrates directly with WoW's Edit Mode system, so configuring your bars feels native.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bazsec/BazBars/master/screenshot.png" alt="BazBars Screenshot" width="800"/>
+  <img src="https://raw.githubusercontent.com/BazAddons/BazBars/master/screenshot.png" alt="BazBars Screenshot" width="800"/>
   <br/>
   <em>Stress-testing the 24x24 grid — because why not?</em>
 </p>
