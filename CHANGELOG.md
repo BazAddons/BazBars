@@ -1,5 +1,24 @@
 # BazBars Changelog
 
+## 045 — Edit Mode and combat-fade fixes
+
+### Bars with combat-only visibility now show in Edit Mode
+
+If you set a bar to only appear in combat (or any conditional that
+hides it), opening Blizzard's Edit Mode while the condition was off
+left the bar invisible — you couldn't see it to drag, resize, or
+configure it. Bars are now forced visible while Edit Mode is open
+regardless of any visibility macro, and snap back to their normal
+condition the moment you close Edit Mode.
+
+### Mouseover fade no longer throws errors in combat
+
+Bars with Mouseover Fade enabled could throw an action-blocked error
+during combat. The fade-in animation was using a Blizzard helper that
+briefly toggles the bar's visibility, which isn't allowed on protected
+frames during combat. The fade now animates the bar's opacity
+directly and is fully combat-safe.
+
 ## 044 — User guide refresh
 
 The in-game User Manual was reorganised and brought up to date. New

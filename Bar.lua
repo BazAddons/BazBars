@@ -270,6 +270,24 @@ function Bar:RegisterEditMode(frame, barData)
         addonName = "BazBars",
         positionKey = false, -- BazBars manages its own barData.pos
 
+        -- Edit Mode override: force every BazBars bar visible while
+        -- Edit Mode is open, regardless of the bar's visibility macro.
+        -- An "in combat only" bar (or any other conditional) is
+        -- otherwise invisible the moment you try to configure it -
+        -- you'd see the overlay but not the bar underneath. We
+        -- unregister the state driver on enter and re-apply it on
+        -- exit so the macro takes over again as soon as you leave
+        -- Edit Mode. Blizzard's Edit Mode itself is gated to out-of-
+        -- combat, so the :Show call here can't trigger ADDON_ACTION
+        -- _BLOCKED.
+        onEnter = function(f)
+            UnregisterStateDriver(f, "visibility")
+            f:Show()
+        end,
+        onExit = function(f)
+            Bar:ApplyVisibility(f)
+        end,
+
         settings = {
             -- Layout
             { type = "input", key = "customName", label = "Bar Name", section = "Layout",
@@ -532,22 +550,30 @@ function Bar:ApplyMouseoverFade(frame)
         -- Start at faded alpha
         frame:SetAlpha(fadeAlpha)
 
-        -- Use a container-level approach: track mouse via OnUpdate
-        -- to avoid flickering when moving between child buttons
         if not frame.bbFadeFrame then
             frame.bbFadeFrame = CreateFrame("Frame", nil, frame)
             frame.bbFadeFrame:SetAllPoints()
         end
 
-        frame.bbFadeFrame:SetScript("OnUpdate", function()
-            local isOver = frame:IsMouseOver()
-            if isOver and not frame.bbFadedIn then
-                frame.bbFadedIn = true
-                UIFrameFadeIn(frame, 0.2, frame:GetAlpha(), fullAlpha)
-            elseif not isOver and frame.bbFadedIn then
-                frame.bbFadedIn = false
-                UIFrameFadeOut(frame, 0.3, frame:GetAlpha(), fadeAlpha)
+        -- Animate alpha directly via OnUpdate. We deliberately avoid
+        -- UIFrameFadeIn / UIFrameFadeOut here - those Blizzard helpers
+        -- internally call frame:Show() to start the animation, which
+        -- throws ADDON_ACTION_BLOCKED on a secure parent frame during
+        -- combat (BazBars bars host SecureActionButtonTemplate buttons,
+        -- so the bar itself is protected). Plain SetAlpha is not
+        -- protected and works in combat without issue.
+        frame.bbFadeFrame:SetScript("OnUpdate", function(_, elapsed)
+            local target = frame:IsMouseOver() and fullAlpha or fadeAlpha
+            local current = frame:GetAlpha()
+            local diff = target - current
+            if math.abs(diff) < 0.01 then
+                if current ~= target then frame:SetAlpha(target) end
+                return
             end
+            -- Asymmetric speeds so fade-in feels snappier than fade-out,
+            -- matching the original 0.2s-in / 0.3s-out timing roughly.
+            local speed = (diff > 0) and 5.0 or 3.3
+            frame:SetAlpha(current + diff * math.min(1, elapsed * speed))
         end)
     else
         -- Disable fade: restore full alpha, remove OnUpdate
