@@ -117,18 +117,39 @@ function Bar:CreateSingleButton(frame, barData, r, c)
             self:SetAttribute("type", nil)
         end
     end)
-    btn:HookScript("PostClick", function(self)
+    btn:HookScript("PostClick", function(self, mouseButton, down)
         if InCombatLockdown() then return end
-        if self._bazStashedType == nil then return end
 
-        self._bazStashedType = nil
-
-        -- If a drop is waiting (real cursor or addon carry), handle it
-        if HasIncomingDrop() then
-            addon.Button:ReceiveDrag(self)
+        -- Drop path: PreClick stashed type because cursor had contents
+        -- at click time. Now restore + dispatch the drop.
+        if self._bazStashedType ~= nil then
+            self._bazStashedType = nil
+            if HasIncomingDrop() then
+                addon.Button:ReceiveDrag(self)
+            end
+            -- ReceiveDrag (if it ran) will have reset the button's type
+            -- attribute via SetActionFromHandler, so we don't need to
+            -- restore the stash.
+            return
         end
-        -- ReceiveDrag (if it ran) will have reset the button's type attribute
-        -- via SetActionFromHandler, so we don't need to restore the stash.
+
+        -- Profession-window opener fallback. Some professions (Dragonflight
+        -- style: Alchemy, Inscription, Blacksmithing, etc.) don't reliably
+        -- open their trade-skill window from a /cast macro - the engine
+        -- routes those opens through C_TradeSkillUI.OpenTradeSkill, which
+        -- only fires on the action-bar slot path in default Blizzard bars.
+        -- Cooking / Fishing / Archaeology DO open via /cast and were the
+        -- early-tested cases that misled us into thinking /cast was enough.
+        -- Calling OpenTradeSkill on a window that's already open is a no-op,
+        -- so this is safe to fire for every profession-eligible spell.
+        if down or mouseButton ~= "LeftButton" then return end
+        if not self.action or self.action.type ~= "spell" then return end
+        local Spell = BazBars.Actions:Get("spell")
+        if not Spell or not Spell.getProfessionSkillLine then return end
+        local skillLine = Spell.getProfessionSkillLine(self.action.data)
+        if skillLine and C_TradeSkillUI and C_TradeSkillUI.OpenTradeSkill then
+            pcall(C_TradeSkillUI.OpenTradeSkill, skillLine)
+        end
     end)
 
     btn.bbBarID = barData.id

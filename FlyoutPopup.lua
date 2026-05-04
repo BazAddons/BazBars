@@ -74,6 +74,20 @@ local function BuildOpts(button, data)
             if Flyout and Flyout.RecordCellClick then
                 Flyout:RecordCellClick(button, cellIndex)
             end
+            -- Profession-window opener fallback. Mirrors the Bar.lua
+            -- PostClick path: when a cell holds a profession spell that
+            -- doesn't open from /cast on its own (Alchemy, Inscription,
+            -- etc.), invoke the trade-skill UI directly. Idempotent for
+            -- professions whose /cast already opened the window.
+            if cellData.type == "spell" and not InCombatLockdown() then
+                local Spell = BazBars.Actions:Get("spell")
+                if Spell and Spell.getProfessionSkillLine then
+                    local skillLine = Spell.getProfessionSkillLine(cellData.data)
+                    if skillLine and C_TradeSkillUI and C_TradeSkillUI.OpenTradeSkill then
+                        pcall(C_TradeSkillUI.OpenTradeSkill, skillLine)
+                    end
+                end
+            end
         end,
 
         onCellEnter  = function(_, cellData, cellBtn)

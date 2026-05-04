@@ -66,19 +66,54 @@ end
 -- Button attributes
 ---------------------------------------------------------------------------
 
+-- All spells route through a /cast macro rather than the type="spell"
+-- attribute. The macro path is what default Blizzard action bars use
+-- internally for profession opens (Cooking, Alchemy, Mining, etc.) -
+-- those don't reliably trigger their trade-skill windows via direct
+-- CastSpellByName / type="spell" / SetAttribute("spell", name) on a
+-- SecureActionButton. Going through /cast unifies the dispatch so
+-- regular spells AND profession opens work equally well, and we
+-- don't need a per-profession detection heuristic that has to keep
+-- up with localised spell names, profession specialisations, etc.
+--
+-- Self-cast (right-click on player) uses [@player] in the macro
+-- conditional, which is the macro-path equivalent of the unit2=
+-- "player" attribute on type="spell".
+
+-- Map a spell ID to its profession's skillLineID, or nil if the spell
+-- isn't part of any profession. Used by the click handler to fall back
+-- to C_TradeSkillUI.OpenTradeSkill for Dragonflight-style professions
+-- (Alchemy, Inscription, Blacksmithing, etc.) whose trade-skill window
+-- doesn't reliably open from a /cast macro the way Cooking, Fishing,
+-- and Archaeology do.
+function Spell.getProfessionSkillLine(data)
+    if not data or not data.id then return nil end
+    if not C_TradeSkillUI or not C_TradeSkillUI.GetProfessionInfoByRecipeID then
+        return nil
+    end
+    local ok, info = pcall(C_TradeSkillUI.GetProfessionInfoByRecipeID, data.id)
+    if not ok or not info then return nil end
+    if info.professionID and info.professionID > 0 then
+        return info.professionID
+    end
+    return nil
+end
+
 function Spell.apply(button, data)
     local name = GetSpellName(data.id)
     if not name then return end
-    button:SetAttribute("type", "spell")
-    button:SetAttribute("spell", name)
+    button:SetAttribute("type", "macro")
+    button:SetAttribute("macrotext", "/cast " .. name)
+    button:SetAttribute("spell", nil)
 end
 
 function Spell.applySelfCast(button, data)
     local name = GetSpellName(data.id)
     if not name then return end
-    button:SetAttribute("type2", "spell")
-    button:SetAttribute("spell2", name)
-    button:SetAttribute("unit2", "player")
+    button:SetAttribute("type2", "macro")
+    button:SetAttribute("macrotext2", "/cast [@player] " .. name)
+    button:SetAttribute("spell2", nil)
+    button:SetAttribute("unit2", nil)
 end
 
 ---------------------------------------------------------------------------

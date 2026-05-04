@@ -1,5 +1,26 @@
 # BazBars Changelog
 
+## 046 — Profession buttons now open their windows
+
+Dragging a profession (Cooking, Alchemy, Inscription, Fishing,
+Archaeology, etc.) from your spellbook onto a BazBars slot used to
+produce a button that did nothing when clicked. Default Blizzard
+action bars handle profession opens through a special slot path
+custom buttons couldn't reach.
+
+Two changes work together to fix this:
+
+- All spells now dispatch via `/cast` macro under the hood. The macro
+  path matches the route Blizzard's bars use and is enough to open
+  the simpler professions (Cooking, Fishing, Archaeology) plus every
+  regular combat spell.
+- For the Dragonflight-style professions (Alchemy, Blacksmithing,
+  Inscription, Engineering, etc.) where `/cast` alone isn't enough,
+  the click also calls `C_TradeSkillUI.OpenTradeSkill` on the
+  appropriate profession line. Harmless for already-open windows.
+
+Works on both regular bar slots and inside flyouts.
+
 ## 045 — Edit Mode and combat-fade fixes
 
 ### Bars with combat-only visibility now show in Edit Mode
