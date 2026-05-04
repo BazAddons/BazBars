@@ -273,6 +273,32 @@ if not Flyout._cursorHooked then
     Flyout._cursorHooked = true
 end
 
+-- Drop-in-empty-space cleanup. The ClearCursor hook above only fires
+-- when WoW itself clears the cursor (Escape, certain unaccepted drops);
+-- a drag-and-release into an empty area of the screen often doesn't
+-- trigger ClearCursor at all, leaving pendingFlyout stuck. Without this,
+-- a subsequent click on the now-empty slot - or any other slot - would
+-- treat the leftover carrier as an incoming drop and re-paint the
+-- flyout that the user thought they'd just deleted.
+--
+-- GLOBAL_MOUSE_UP fires after every mouse release. Frame-level handlers
+-- (OnReceiveDrag, PostClick) run BEFORE this event, so legitimate drops
+-- onto another BazBars slot or any handler that accepts the carrier
+-- have already cleared pendingFlyout via ReceiveDrag by the time we
+-- get here. Anything still carried at this point is by definition
+-- unaccepted and should be discarded.
+if not Flyout._mouseUpHooked then
+    local watcher = CreateFrame("Frame")
+    watcher:RegisterEvent("GLOBAL_MOUSE_UP")
+    watcher:SetScript("OnEvent", function()
+        if pendingFlyout then
+            pendingFlyout = nil
+            HideFollower()
+        end
+    end)
+    Flyout._mouseUpHooked = true
+end
+
 function Flyout.fromCursor()
     -- Native flyout dragged from the spellbook.
     local cType, flyoutID = GetCursorInfo()

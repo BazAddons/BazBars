@@ -1,5 +1,18 @@
 # BazBars Changelog
 
+## 049 — Dragging a flyout off the bar actually deletes it
+
+Picking up a flyout from a bar slot and dropping in empty space used
+to clear the slot visually but leave an invisible "I'm carrying a
+flyout" state behind. The next click on that slot — or any other
+empty slot — would silently re-apply the flyout, making it look like
+the deletion didn't happen.
+
+The carrier now clears the moment you release the mouse without
+landing on a slot, matching what default Blizzard action bars do for
+spell drags. Drag-and-drop between slots still works exactly as
+before.
+
 ## 048 — Trade goods on a bar no longer look subdued
 
 Tracking herbs, ore, raw fish, feathers, and other tradegood items
