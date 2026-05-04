@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/BazAddons/BazBars/master/logo.png" alt="BazBars Logo" width="300"/>
-</p>
-
 <h1 align="center">BazBars</h1>
 
 <p align="center">
