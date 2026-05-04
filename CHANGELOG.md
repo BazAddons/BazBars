@@ -1,5 +1,24 @@
 # BazBars Changelog
 
+## 051 — In-game User Manual now has screenshots
+
+The User Manual page (Settings → BazBars → User Manual) is now
+illustrated end-to-end. Screenshots are paired with the relevant
+copy throughout: creating a bar, item stack tracking, the flyout
+configuration form, big flyout grids, the per-bar settings popup,
+Quick Keybind Mode, and the full Bar Customizer. Most images sit
+side-by-side with their explanation now (using BazCore's new
+`imageRow` block) instead of taking a full row each. The settings
+sections list (Layout, Visibility, Keybinds, Appearance, Behaviour,
+Actions) is no longer collapsed under expandable headers — every
+section is visible at once.
+
+A few wording tweaks while we were in there: the "Create a Bar"
+steps correctly say the button is at the **bottom** of the Edit
+Mode panel.
+
+Requires BazCore 109+ for the new `imageRow` block.
+
 ## 050 — Empty flyouts now show a question-mark icon
 
 A flyout slot whose current cell had no resolvable icon (an empty
