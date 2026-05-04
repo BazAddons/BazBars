@@ -1,5 +1,16 @@
 # BazBars Changelog
 
+## 050 — Empty flyouts now show a question-mark icon
+
+A flyout slot whose current cell had no resolvable icon (an empty
+flyout, or one whose super-tracked spell isn't learned yet) used to
+render as a blank slot, indistinguishable from a slot with no action
+at all. It now falls back to the standard `?` icon so you can see
+the slot is configured as a flyout.
+
+(Also adds screenshot assets for the upcoming in-game User Manual
+image refresh — no behaviour change there yet.)
+
 ## 049 — Dragging a flyout off the bar actually deletes it
 
 Picking up a flyout from a bar slot and dropping in empty space used

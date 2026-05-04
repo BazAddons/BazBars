@@ -405,16 +405,27 @@ end
 
 function Flyout.getIcon(data)
     local handler, hData = CurrentHandler(data)
-    if handler and handler.getIcon then return handler.getIcon(hData) end
-    -- Fallback to the first cell's icon even when unknown so a freshly
-    -- dropped flyout shows something on a character that hasn't learned
-    -- any of its spells yet.
+    if handler and handler.getIcon then
+        local icon = handler.getIcon(hData)
+        if icon then return icon end
+    end
+    -- Fallback to the first cell's icon even when no current handler
+    -- resolved (e.g. flyout from a character that hasn't learned the
+    -- super-tracked spell yet, or a custom flyout whose first cell's
+    -- icon API hiccuped).
     local cells = ResolveCells(data)
     if cells[1] then
         local h = BazBars.Actions:Get(cells[1].type)
-        if h and h.getIcon then return h.getIcon(cells[1].data) end
+        if h and h.getIcon then
+            local icon = h.getIcon(cells[1].data)
+            if icon then return icon end
+        end
     end
-    return nil
+    -- Final fallback for empty flyouts (no cells) and any other case
+    -- where no icon resolved. Without this an empty flyout slot looks
+    -- visually identical to an empty bar slot, hiding that the slot
+    -- is configured as a flyout at all.
+    return "Interface\\Icons\\INV_Misc_QuestionMark"
 end
 
 function Flyout.getName(data)
