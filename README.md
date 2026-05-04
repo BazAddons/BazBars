@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://bazaddons.com"><img src="https://img.shields.io/badge/Part_of-BazAddons-b8924a?labelColor=2a2519" alt="Part of the BazAddons suite"/></a>
-  <img src="https://img.shields.io/badge/WoW-12.0%20Midnight-blue" alt="WoW Version"/>
+  <a href="https://worldofwarcraft.blizzard.com/en-us/midnight"><img src="https://img.shields.io/badge/WoW-12.0%20Midnight-blue" alt="WoW Version"/></a>
   <img src="https://img.shields.io/badge/License-GPL%20v2-green" alt="License"/>
   <img src="https://img.shields.io/github/v/tag/BazAddons/BazBars?label=Version&color=orange" alt="Version"/>
 </p>
