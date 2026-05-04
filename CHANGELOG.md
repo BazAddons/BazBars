@@ -1,5 +1,15 @@
 # BazBars Changelog
 
+## 047 — Items dropped on a former-flyout slot now create item buttons
+
+Picking up a flyout to move it and then changing your mind — grabbing
+something else from your bag or spellbook instead — used to leave the
+"I'm carrying a flyout" flag stuck on. The next thing you dropped on
+any slot would silently turn into a flyout regardless of what was on
+your cursor (peacebloom landing as a question-mark flyout button, for
+example). The carrier now yields the moment you pick something else
+up, so the right action handler claims the drop.
+
 ## 046 — Profession buttons now open their windows
 
 Dragging a profession (Cooking, Alchemy, Inscription, Fishing,

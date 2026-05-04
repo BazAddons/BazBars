@@ -291,9 +291,20 @@ function Flyout.fromCursor()
         }
     end
 
-    -- Internal carry from a slot-to-slot drag. Consume on read so a
-    -- subsequent drop attempt doesn't re-fire.
+    -- Internal carry from a slot-to-slot drag. Only claim the drop when
+    -- the actual cursor is empty - that's the legitimate "finishing a
+    -- carry" case. If cType is non-nil here, the user picked something
+    -- else up (item from bag, spell from spellbook, etc.) without
+    -- finishing the carry; the stale carrier should yield so the real
+    -- handler can claim. Without this, a leftover pendingFlyout would
+    -- intercept every subsequent drop because Flyout sorts ahead of
+    -- Item / Spell / etc. in the cursor-detection priority order.
     if pendingFlyout then
+        if cType then
+            pendingFlyout = nil
+            HideFollower()
+            return
+        end
         local data = pendingFlyout
         pendingFlyout = nil
         HideFollower()
