@@ -1,5 +1,18 @@
 # BazBars Changelog
 
+## 048 — Trade goods on a bar no longer look subdued
+
+Tracking herbs, ore, raw fish, feathers, and other tradegood items
+on a bar made the icon look dimmed and broken — not actually
+unusable, just visually drained. The check that drove the dim was
+asking "is this item click-to-activate?", which trade goods aren't,
+but tradegoods on a bar are typically there to track inventory count
+rather than to be used, so the dim was misleading.
+
+Items now always render at full colour. Cooldown sweeps, stack
+counts, and out-of-range tinting still appear on items that have
+those states (potions, on-use trinkets), so nothing useful is lost.
+
 ## 047 — Items dropped on a former-flyout slot now create item buttons
 
 Picking up a flyout to move it and then changing your mind — grabbing

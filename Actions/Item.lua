@@ -91,8 +91,16 @@ function Item.getCooldown(data)
 end
 
 function Item.isUsable(data)
-    local usable = C_Item.IsUsableItem(data.id)
-    return usable, false
+    -- Always render items at full color when they're on a bar.
+    -- C_Item.IsUsableItem returns false for trade goods (herbs, ore,
+    -- raw fish, feathers, etc.) because they're not click-to-activate
+    -- items - that drove the icon-dim tint in UpdateUsable, making
+    -- those slots look broken when really they're just being used to
+    -- track inventory count. Range / cooldown / stack-count visuals
+    -- already give the right feedback for items that actually have
+    -- a usable state (potions, scrolls, on-use trinkets); the
+    -- IsUsableItem dimming added nothing on top of that.
+    return true, false
 end
 
 function Item.isInRange(data, unit)
