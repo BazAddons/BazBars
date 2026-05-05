@@ -23,12 +23,6 @@ BazBars lets you create as many action bars as you need, with fully customizable
 
 Buttons look and feel identical to Blizzard's default action bars, using the same atlas textures, icon masks, cooldown animations, and proc glows. BazBars integrates directly with WoW's Edit Mode system, so configuring your bars feels native.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/BazAddons/BazBars/master/screenshot.png" alt="BazBars Screenshot" width="800"/>
-  <br/>
-  <em>Stress-testing the 24x24 grid — because why not?</em>
-</p>
-
 ---
 
 ## Features
