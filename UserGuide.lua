@@ -75,7 +75,7 @@ BazCore:RegisterUserGuide("BazBars", {
             title = "Creating a Bar",
             blocks = {
                 { type = "paragraph", text = "Open Blizzard's |cffffd700Edit Mode|r (default key Shift+F11)." },
-                ImageRow("create-new-bar", "The Create New BazBar button sits at the bottom of the Edit Mode panel.", {
+                ImageRow("bar-create-button", "The Create New BazBar button sits at the bottom of the Edit Mode panel.", {
                     { type = "list", ordered = true, items = {
                         "Scroll to the bottom of the Edit Mode panel",
                         "Click the |cffffd700Create New BazBar|r button",
@@ -185,7 +185,7 @@ BazCore:RegisterUserGuide("BazBars", {
         {
             title = "Editing a Bar",
             blocks = {
-                ImageRow("edit-mode-bar-menu", "Per-bar settings popup. Selected bar highlighted yellow; everything you can configure for the bar is here.", {
+                ImageRow("bar-settings-popup", "Per-bar settings popup. Selected bar highlighted yellow; everything you can configure for the bar is here.", {
                     { type = "paragraph", text = "While in Edit Mode, click any BazBar to select it (yellow highlight). Click again to open its settings popup." },
                     { type = "paragraph", text = "Every per-bar option lives here: layout, visibility, keybinds, appearance, behaviour, and actions like duplicate / export / delete." },
                 }),

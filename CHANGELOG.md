@@ -1,5 +1,10 @@
 # BazBars Changelog
 
+## 053 — Updated User Manual screenshots
+
+Refreshed the "Creating a Bar" and "Editing a Bar" screenshots to
+match the current Edit Mode panel and per-bar settings popup.
+
 ## 052 — Profession openers work on flyout slots too
 
 Left-clicking a flyout slot whose current cell is a profession spell
