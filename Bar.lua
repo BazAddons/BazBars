@@ -143,10 +143,27 @@ function Bar:CreateSingleButton(frame, barData, r, c)
         -- Calling OpenTradeSkill on a window that's already open is a no-op,
         -- so this is safe to fire for every profession-eligible spell.
         if down or mouseButton ~= "LeftButton" then return end
-        if not self.action or self.action.type ~= "spell" then return end
+        if not self.action then return end
+
+        -- Resolve the action whose spell ID we should consult: a flyout
+        -- slot's left-click casts the *current cell's* spell, so the
+        -- profession-window opener has to follow the flyout into its
+        -- selected cell. Without this, only "spell"-typed slots would
+        -- get the OpenTradeSkill fallback - and a flyout slot whose
+        -- current cell is e.g. Mining would silently fail to open the
+        -- profession window even though the spell cast went through.
+        local effective = self.action
+        if effective.type == "flyout" then
+            local Flyout = BazBars.Actions:Get("flyout")
+            if Flyout and Flyout.GetCurrentAction then
+                effective = Flyout.GetCurrentAction(effective.data)
+            end
+        end
+        if not effective or effective.type ~= "spell" then return end
+
         local Spell = BazBars.Actions:Get("spell")
         if not Spell or not Spell.getProfessionSkillLine then return end
-        local skillLine = Spell.getProfessionSkillLine(self.action.data)
+        local skillLine = Spell.getProfessionSkillLine(effective.data)
         if skillLine and C_TradeSkillUI and C_TradeSkillUI.OpenTradeSkill then
             pcall(C_TradeSkillUI.OpenTradeSkill, skillLine)
         end

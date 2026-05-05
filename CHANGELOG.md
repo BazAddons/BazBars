@@ -1,5 +1,17 @@
 # BazBars Changelog
 
+## 052 — Profession openers work on flyout slots too
+
+Left-clicking a flyout slot whose current cell is a profession spell
+(Alchemy, Inscription, Blacksmithing, Mining, etc.) now reliably
+opens the trade-skill window — the same way clicking a regular bar
+slot with that profession spell does. The profession-window opener
+fallback used to only fire on `spell`-type slots, so a flyout slot
+sitting on a profession would intermittently fail to open the
+window depending on which profession the cell held: Cooking and
+Fishing happened to open from `/cast`, but Alchemy and Inscription
+didn't. The fallback now follows flyouts into their current cell.
+
 ## 051 — In-game User Manual now has screenshots
 
 The User Manual page (Settings → BazBars → User Manual) is now
