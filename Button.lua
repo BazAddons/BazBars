@@ -469,15 +469,22 @@ local function GetBarSlotSection(ctx)
     if not action then
         return {
             {
-                label = "Create flyout (1x3)",
+                label = "Create flyout...",
                 onClick = function()
                     if InCombatLockdown() then return end
                     local Flyout = addon.FlyoutHandler
                     if not Flyout then return end
                     local handler = BazBars.Actions:Get("flyout")
                     if not handler then return end
+                    -- Seed with a default 1x3 so the slot is a flyout
+                    -- the moment the config form opens; the user
+                    -- adjusts rows / cols / direction / mode in the
+                    -- form and the live preview reshapes as they go.
                     Button:SetActionFromHandler(btn, handler,
                         Flyout.MakeDefault({ rows = 1, cols = 3 }))
+                    if addon.FlyoutPopup and addon.FlyoutPopup.OpenConfig then
+                        addon.FlyoutPopup:OpenConfig(btn)
+                    end
                 end,
             },
         }
@@ -522,17 +529,15 @@ function BazBarsButton_PostClick(self, button)
     -- "Inspect this tooltip" being the first such consumer).
     if button == "RightButton" and IsShiftKeyDown() then
         if BazCore.OpenContextMenu then
-            local title
-            if self.action and self.action.type then
-                local handler = BazBars.Actions:Get(self.action.type)
-                if handler and handler.getName then
-                    title = handler.getName(self.action.data)
-                end
-            end
+            -- No title intentionally - the slot's icon is already
+            -- visible right next to the menu, so a title would just
+            -- echo what the user can see. Bag-stack menus need the
+            -- item link as a title to disambiguate stack vs single,
+            -- but bar slots don't have that ambiguity.
             BazCore:OpenContextMenu("bar-slot", self, {
                 button = self,
                 action = self.action,
-            }, { title = title })
+            })
         end
         return
     end

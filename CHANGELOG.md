@@ -1,5 +1,17 @@
 # BazBars Changelog
 
+## 055 — Bar slot menu polish
+
+- "Create flyout..." on an empty slot now spawns the default 1×3
+  flyout *and* opens the configuration form immediately, so you can
+  reshape rows / cols / direction in one go without a second
+  shift+right-click.
+- Removed the redundant title at the top of the bar-slot menu - the
+  slot icon is right next to the menu, no need to echo it.
+- Shortened the "Remember Current Spell Across Sessions" toggle
+  label to "Remember across sessions" so the text fits inside the
+  config form's panel width.
+
 ## 054 — Bar slot shift+right-click is now a shared menu
 
 Shift+right-clicking a bar slot used to fire a direct action: spawn a

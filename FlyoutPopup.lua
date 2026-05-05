@@ -343,7 +343,7 @@ function FlyoutPopup:OpenConfig(button)
               default = data.mode or "lastUsed",
               values = MODE_VALUES },
             { type = "toggle", key = "persistCurrent",
-              label = "Remember Current Spell Across Sessions",
+              label = "Remember across sessions",
               default = data.persistCurrent ~= false },
         },
         buttons = {
