@@ -451,39 +451,89 @@ function BazBarsButton_OnDragStart(self)
     Button:StartDrag(self)
 end
 
+---------------------------------------------------------------------------
+-- bar-slot context menu section
+--
+-- Three behaviours collapsed into one menu, registered against the
+-- shared "bar-slot" scope so other addons can append entries:
+--   * empty slot      -> "Create flyout (1x3)"
+--   * flyout slot     -> "Configure flyout..."
+--   * other filled    -> "Clear button"
+---------------------------------------------------------------------------
+
+local function GetBarSlotSection(ctx)
+    if not ctx or not ctx.button then return end
+    local btn    = ctx.button
+    local action = ctx.action
+
+    if not action then
+        return {
+            {
+                label = "Create flyout (1x3)",
+                onClick = function()
+                    if InCombatLockdown() then return end
+                    local Flyout = addon.FlyoutHandler
+                    if not Flyout then return end
+                    local handler = BazBars.Actions:Get("flyout")
+                    if not handler then return end
+                    Button:SetActionFromHandler(btn, handler,
+                        Flyout.MakeDefault({ rows = 1, cols = 3 }))
+                end,
+            },
+        }
+    end
+
+    if action.type == "flyout" then
+        return {
+            {
+                label = "Configure flyout...",
+                onClick = function()
+                    if InCombatLockdown() then return end
+                    if addon.FlyoutPopup and addon.FlyoutPopup.OpenConfig then
+                        addon.FlyoutPopup:OpenConfig(btn)
+                    end
+                end,
+            },
+        }
+    end
+
+    return {
+        {
+            label = "Clear button",
+            onClick = function()
+                if InCombatLockdown() then return end
+                Button:ClearAction(btn)
+            end,
+        },
+    }
+end
+
+if BazCore.RegisterContextMenuSection then
+    BazCore:RegisterContextMenuSection("bar-slot", "BazBars", GetBarSlotSection)
+end
+
 function BazBarsButton_PostClick(self, button)
     if InCombatLockdown() then return end
 
-    -- Shift+Right-Click is the standard "config / context" gesture
-    -- across BazCore addons:
-    --   * empty slot      -> spawn a default flyout (1x3, UP, lastUsed)
-    --   * flyout slot     -> open per-slot config (TODO: config popup)
-    --   * other filled    -> clear (legacy behaviour preserved)
+    -- Shift+Right-Click opens a context menu. BazBars's own actions
+    -- (spawn flyout / configure flyout / clear button) live as
+    -- entries in that menu, sharing the popup with any other addon
+    -- that registers under the "bar-slot" scope (BazTooltipEditor's
+    -- "Inspect this tooltip" being the first such consumer).
     if button == "RightButton" and IsShiftKeyDown() then
-        if not self.action then
-            local Flyout = addon.FlyoutHandler
-            if Flyout then
-                local handler = BazBars.Actions:Get("flyout")
-                if handler then
-                    Button:SetActionFromHandler(self, handler,
-                        Flyout.MakeDefault({ rows = 1, cols = 3 }))
+        if BazCore.OpenContextMenu then
+            local title
+            if self.action and self.action.type then
+                local handler = BazBars.Actions:Get(self.action.type)
+                if handler and handler.getName then
+                    title = handler.getName(self.action.data)
                 end
             end
-            return
+            BazCore:OpenContextMenu("bar-slot", self, {
+                button = self,
+                action = self.action,
+            }, { title = title })
         end
-
-        if self.action.type == "flyout" then
-            -- Open the per-slot config form (rows / cols / direction /
-            -- mode / persist). Cell editing is still done by opening
-            -- the popup with a normal right-click and dropping spells
-            -- onto cells.
-            if addon.FlyoutPopup and addon.FlyoutPopup.OpenConfig then
-                addon.FlyoutPopup:OpenConfig(self)
-            end
-            return
-        end
-
-        Button:ClearAction(self)
         return
     end
 

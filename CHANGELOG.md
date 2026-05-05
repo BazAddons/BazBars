@@ -1,5 +1,22 @@
 # BazBars Changelog
 
+## 054 — Bar slot shift+right-click is now a shared menu
+
+Shift+right-clicking a bar slot used to fire a direct action: spawn a
+flyout on an empty slot, open the configure form on a flyout slot,
+clear the action on any other slot. Each of those is now a single
+entry in a context menu opened via BazCore's shared `bar-slot` scope
+(BazCore 116+) — same pattern BazBags uses for its bag-item menu.
+
+Other addons can register their own entries against `bar-slot` and
+they'll appear in the same menu. BazTooltipEditor's "Inspect this
+tooltip" entry, for example, now shows up automatically.
+
+The trade-off: one extra click for the previously-direct actions
+(menu opens, then click the entry). In return, every shift+right-
+click on any BazCore-aware frame opens a consistent menu instead of
+each addon doing its own thing.
+
 ## 053 — Updated User Manual screenshots
 
 Refreshed the "Creating a Bar" and "Editing a Bar" screenshots to
