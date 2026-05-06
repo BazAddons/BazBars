@@ -424,6 +424,13 @@ function Bar:RegisterEditMode(frame, barData)
                   addon.db.profile.bars[bd.id].rightClickSelfCast = v
                   addon.Button:ApplySelfCast(frame)
               end },
+            { type = "checkbox", key = "clickThrough", label = "Click-Through", section = "Behavior",
+              get = function() return BazBars.GetBarSetting(bd, "clickThrough") or false end,
+              set = function(v)
+                  bd.clickThrough = v
+                  addon.db.profile.bars[bd.id].clickThrough = v
+                  Bar:ApplyClickThrough(frame)
+              end },
         },
 
         actions = {
@@ -697,6 +704,27 @@ function Bar:UpdateButtonVisibility(frame)
     end
 end
 
+---------------------------------------------------------------------------
+-- Click-through: when enabled, the bar's buttons stop intercepting mouse
+-- events so clicks pass through to whatever's underneath (the world,
+-- units, the default action bar, etc.). Buttons stay rendered - icons,
+-- cooldown sweeps, range tinting, charge counts, and proc glow all still
+-- work because they're driven by data, not clicks. The user just can't
+-- *click* them while click-through is on.
+--
+-- Useful for "always-visible cooldown reference" bars where the user
+-- wants to see a spell's cooldown but cast via a different bar's keybind.
+---------------------------------------------------------------------------
+
+function Bar:ApplyClickThrough(frame)
+    local clickThrough = BazBars.GetBarSetting(frame.barData, "clickThrough") and true or false
+    for r, row in pairs(frame.buttons) do
+        for c, btn in pairs(row) do
+            btn:EnableMouse(not clickThrough)
+        end
+    end
+end
+
 function Bar:UpdateSlotArt(frame)
     local show = BazBars.GetBarSetting(frame.barData, "showSlotArt") ~= false
     for r, row in pairs(frame.buttons) do
@@ -761,6 +789,7 @@ function Bar:LoadAll()
             Bar:UpdateButtonVisibility(frame)
             Bar:SetBarAlpha(frame, BazBars.GetBarSetting(barData, "alpha") or 1.0)
             Bar:ApplyMouseoverFade(frame)
+            Bar:ApplyClickThrough(frame)
         end
     end
 end

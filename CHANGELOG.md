@@ -1,5 +1,18 @@
 # BazBars Changelog
 
+## 056 — Click-Through bars
+
+Per-bar toggle that makes the bar's buttons stop intercepting mouse
+clicks - clicks pass straight through to whatever's underneath (the
+world, units, the default action bars, etc.) while the bar's icons,
+cooldown sweeps, range tinting, charge counts, and proc glow all
+keep rendering normally. Useful for "always-visible cooldown
+reference" bars where you want to *see* a spell's status but cast it
+from a different bar's keybind.
+
+Find it in Edit Mode → click a bar → Behavior → Click-Through, or
+in the per-bar settings page. Also exposed as a global override.
+
 ## 055 — Bar slot menu polish
 
 - "Create flyout..." on an empty slot now spawns the default 1×3

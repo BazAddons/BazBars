@@ -227,6 +227,21 @@ BuildBarOptions = function(id, barData)
                 end,
                 disabled = function() return BazBars.IsGlobalOverrideActive("showSlotArt") end,
             },
+            clickThrough = {
+                order = 24,
+                type = "toggle",
+                name = "Click-Through",
+                desc = "Bar buttons stop intercepting mouse clicks. Icons, cooldowns, range tinting, and proc glow all still render - you just can't click the buttons directly while this is on. Useful for visual-reference bars.",
+                get = function() return BazBars.GetBarSetting(barData, "clickThrough") or false end,
+                set = function(_, val)
+                    barData.clickThrough = val
+                    local frame = addon.Bar:Get(id)
+                    if frame then
+                        addon.Bar:ApplyClickThrough(frame)
+                    end
+                end,
+                disabled = function() return BazBars.IsGlobalOverrideActive("clickThrough") end,
+            },
             lockButtons = {
                 order = 24,
                 type = "toggle",
@@ -421,6 +436,7 @@ local function GetGlobalOptionsTable()
             { key = "showSlotArt",       label = "Show Slot Art",       type = "toggle",  default = true },
             { key = "alwaysShowButtons", label = "Always Show Buttons", type = "toggle",  default = true },
             { key = "mouseoverFade",     label = "Mouseover Fade",      type = "toggle",  default = false },
+            { key = "clickThrough",      label = "Click-Through",       type = "toggle",  default = false },
         },
     })
 end
