@@ -1,5 +1,32 @@
 # BazBars Changelog
 
+## 057 — Per-character button payloads
+
+Slotted spells / macros / items now live with the character, not with
+the profile. Sharing a profile across characters of different classes
+no longer carries the first character's abilities onto the second's
+buttons.
+
+What stays in the profile (shared across characters):
+- Bar count, size, position, scale, alpha
+- Keybind layout (which key fires which slot)
+- Visibility / fade / lock / chrome settings
+
+What's now per-character:
+- Which spell, macro, item, mount, etc. is in each button slot
+
+When you load with a profile that has slotted buttons from before
+the update, you'll see a one-time chat message: *"Moved N button
+payloads across M bar(s) into per-character storage..."* Your active
+character keeps everything it had. Other characters using the same
+profile will start with empty bars and you slot their abilities once.
+After that everything stays separate.
+
+Duplicating a bar copies the current character's slotted buttons to
+the new bar. Importing a bar applies the imported abilities to the
+current character only. Exporting a bar bakes in the current
+character's slotted buttons so the receiver gets the full setup.
+
 ## 056 — Click-Through bars
 
 Per-bar toggle that makes the bar's buttons stop intercepting mouse

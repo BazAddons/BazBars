@@ -171,9 +171,113 @@ local addon = BazCore:RegisterAddon("BazBars", {
 
 })
 
+---------------------------------------------------------------------------
+-- Per-character button payloads
+---------------------------------------------------------------------------
+--
+-- Bar STRUCTURE (cols/rows/scale/position/keybind shape) lives in the
+-- profile and is meant to be shared across characters. Bar PAYLOADS
+-- (the actual spell/macro/item slotted into each button) are class-
+-- specific, so they live OUTSIDE the profile in a per-character /
+-- per-profile / per-bar bucket:
+--
+--   BazBarsDB.charButtons[charKey][profileName][barID]["r:c"] = action
+--
+-- LoadButton / SaveButton route reads + writes through this bucket. A
+-- one-shot migration on first load with the new format moves any
+-- legacy profile.bars[id].buttons into the current character's bucket
+-- so users coming from earlier versions don't lose their slotted
+-- abilities; other characters using the same profile then start with
+-- empty bars and re-slot independently (the desired behavior).
+---------------------------------------------------------------------------
+
+local function GetCharKey()
+    local name, realm = UnitFullName("player")
+    return (name or "Unknown") .. "-" .. (realm or "Unknown")
+end
+
+local function GetActiveProfileName()
+    if BazCore and BazCore.GetActiveProfile then
+        return BazCore:GetActiveProfile("BazBars") or "Default"
+    end
+    return "Default"
+end
+
+local function CharBucket(create)
+    if not BazBarsDB then return nil end
+    if create then BazBarsDB.charButtons = BazBarsDB.charButtons or {} end
+    local cb = BazBarsDB.charButtons
+    if not cb then return nil end
+    local ck = GetCharKey()
+    if create then cb[ck] = cb[ck] or {} end
+    if not cb[ck] then return nil end
+    local pn = GetActiveProfileName()
+    if create then cb[ck][pn] = cb[ck][pn] or {} end
+    return cb[ck][pn]
+end
+
+function addon:GetCharBarButtons(barID, create)
+    local bucket = CharBucket(create)
+    if not bucket then return nil end
+    if create then bucket[barID] = bucket[barID] or {} end
+    return bucket[barID]
+end
+
+function addon:GetButtonPayload(barID, key)
+    local t = self:GetCharBarButtons(barID, false)
+    return t and t[key] or nil
+end
+
+function addon:SetButtonPayload(barID, key, payload)
+    local t = self:GetCharBarButtons(barID, true)
+    if not t then return end
+    t[key] = payload   -- nil clears
+end
+
+function addon:ClearCharBarButtons(barID)
+    local bucket = CharBucket(false)
+    if bucket then bucket[barID] = nil end
+end
+
+-- One-shot migration: walks profile.bars[*].buttons and moves each
+-- payload to the current character's bucket. Per-profile sentinel so
+-- subsequent characters using the same profile DON'T inherit (which
+-- is the bug we're fixing). Run before any LoadButton call so the
+-- live load reads from the new location.
+function addon:MigrateButtonsToCharStorage()
+    local profile = self.db and self.db.profile
+    if not profile or not profile.bars then return end
+    if profile._bbCharButtonsMigrated then return end
+
+    local moved = 0
+    local barsTouched = 0
+    for barID, barData in pairs(profile.bars) do
+        if barData.buttons and next(barData.buttons) then
+            local target = self:GetCharBarButtons(barID, true)
+            if target then
+                for key, payload in pairs(barData.buttons) do
+                    target[key] = payload
+                    moved = moved + 1
+                end
+                barsTouched = barsTouched + 1
+            end
+            barData.buttons = {}   -- clear from profile
+        end
+    end
+
+    profile._bbCharButtonsMigrated = true
+
+    if moved > 0 then
+        self:Print(string.format(
+            "Moved %d button payloads across %d bar(s) into per-character storage. Other characters using this profile will start with empty bars - slot their own abilities and they'll save independently.",
+            moved, barsTouched))
+    end
+end
+
 -- Lifecycle callbacks (defined after addon is assigned)
 addon.config.onLoad = function(self)
     self:MigrateFromAceDB()
+    self:MigrateButtonsToCharStorage()
     self.Options:Setup()
 end
 
@@ -472,6 +576,16 @@ function addon:ExportBar(barID)
     local exportData = CopyTable(barData)
     exportData.pos = nil
     exportData.id = nil
+    -- Bake the CURRENT character's slotted payloads into the export
+    -- so the receiver gets both structure and contents. The profile
+    -- side stays empty post-migration; reading from charButtons is
+    -- where the actual data lives now.
+    local charBtns = self:GetCharBarButtons(barID, false)
+    if charBtns and next(charBtns) then
+        exportData.buttons = CopyTable(charBtns)
+    else
+        exportData.buttons = nil
+    end
 
     return BazCore:Serialize(exportData)
 end
@@ -491,8 +605,23 @@ function addon:ImportBar(encodedString)
     local newID = self.Bar:GetNextID()
     barData.id = newID
     barData.pos = nil
+    -- Pull any imported button payloads OFF the profile entry and
+    -- apply them to the current character's bucket. The profile
+    -- itself stays structure-only.
+    local importedButtons = barData.buttons
+    barData.buttons = {}
 
     self.db.profile.bars[newID] = barData
+
+    if importedButtons and next(importedButtons) then
+        local target = self:GetCharBarButtons(newID, true)
+        if target then
+            for key, payload in pairs(importedButtons) do
+                target[key] = CopyTable(payload)
+            end
+        end
+    end
+
     local frame = self.Bar:Create(barData)
 
     for r, row in pairs(frame.buttons) do
@@ -533,8 +662,23 @@ function addon:DuplicateBar(sourceID)
     newData.id = newID
     newData.pos = nil
     newData.customName = (newData.customName or ("Bar " .. sourceID)) .. " (Copy)"
+    -- Buttons live per-character now; the profile copy carries no
+    -- payload data (it would be empty anyway post-migration). We
+    -- copy the current character's source-bar payload into the new
+    -- bar's per-char bucket below.
+    newData.buttons = {}
 
     self.db.profile.bars[newID] = newData
+
+    -- Mirror the current character's slotted buttons from source -> new.
+    local sourceBtns = self:GetCharBarButtons(sourceID, false)
+    if sourceBtns and next(sourceBtns) then
+        local targetBtns = self:GetCharBarButtons(newID, true)
+        for key, payload in pairs(sourceBtns) do
+            targetBtns[key] = CopyTable(payload)
+        end
+    end
+
     local frame = self.Bar:Create(newData)
 
     for r, row in pairs(frame.buttons) do
@@ -579,6 +723,12 @@ function addon:DeleteBar(id)
 
     if self.Bar:Destroy(id) then
         self.db.profile.bars[id] = nil
+        -- Clear the current character's payload for this bar. Other
+        -- characters' payloads for this bar in this profile are now
+        -- orphaned but harmless; they'll be cleaned up on the next
+        -- per-profile cleanup pass (or never - they consume a few
+        -- bytes of SV memory and are easy to ignore).
+        self:ClearCharBarButtons(id)
         self.Options:Refresh()
         self:Print("Bar " .. id .. " deleted.")
     else

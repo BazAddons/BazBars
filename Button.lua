@@ -390,24 +390,25 @@ end
 ---------------------------------------------------------------------------
 
 function Button:SaveButton(btn)
-    local db = addon.db.profile.bars[btn.bbBarID]
-    if not db then return end
-    db.buttons = db.buttons or {}
+    -- Sanity: bar must still exist in the profile (structure check).
+    -- The actual payload lands in the per-character bucket via
+    -- addon:SetButtonPayload, NOT in profile.bars[id].buttons.
+    if not addon.db.profile.bars[btn.bbBarID] then return end
     local key = btn.bbRow .. ":" .. btn.bbCol
 
     if btn.action then
-        db.buttons[key] = BazBars.Actions:Serialize(btn.action)
+        addon:SetButtonPayload(btn.bbBarID, key,
+            BazBars.Actions:Serialize(btn.action))
     else
-        db.buttons[key] = nil
+        addon:SetButtonPayload(btn.bbBarID, key, nil)
     end
 end
 
 function Button:LoadButton(btn)
-    local db = addon.db.profile.bars[btn.bbBarID]
-    if not db or not db.buttons then return end
+    if not addon.db.profile.bars[btn.bbBarID] then return end
 
     local key = btn.bbRow .. ":" .. btn.bbCol
-    local saved = db.buttons[key]
+    local saved = addon:GetButtonPayload(btn.bbBarID, key)
     if not saved then return end
 
     -- New format: { type = "...", data = {...} }
