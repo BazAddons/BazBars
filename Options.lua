@@ -328,6 +328,37 @@ local function GetSettingsOptionsTable()
                 type = "lead",
                 text = "Display, tooltip, and combat preferences that apply to every BazBar. Per-bar settings live under Bar Options.",
             },
+            blizzardHeader = {
+                order = 0.4,
+                type = "header",
+                name = "Blizzard UI",
+            },
+            hideDefaultActionBar = {
+                order = 0.5,
+                type = "toggle",
+                name = "Hide Default Action Bar (Bar 1)",
+                desc = "Hide Blizzard's main action bar (slots 1-12 plus all chrome). Edit Mode lets you hide bars 2-8 already; this fills the gap for Bar 1.\n\nKeybinds 1-12 still fire whatever's slotted on those buttons; only the visible UI is hidden. Toggling in combat is deferred until combat ends.",
+                get = function() return addon.db.profile.hideDefaultActionBar == true end,
+                set = function(_, val)
+                    addon.db.profile.hideDefaultActionBar = val
+                    if addon.ApplyDefaultBarVisibility then
+                        addon:ApplyDefaultBarVisibility()
+                    end
+                end,
+            },
+            hideDefaultActionBarArt = {
+                order = 0.6,
+                type = "toggle",
+                name = "Hide Bar 1 Art Only",
+                desc = "Hide just the chrome (the gryphon/wyvern endcaps and the dark border frame) on Bar 1, while keeping the buttons themselves visible. Useful if you still use Bar 1's buttons but want the decorative art gone.\n\nIgnored when 'Hide Default Action Bar' is on (everything is hidden anyway).",
+                get = function() return addon.db.profile.hideDefaultActionBarArt == true end,
+                set = function(_, val)
+                    addon.db.profile.hideDefaultActionBarArt = val
+                    if addon.ApplyDefaultBarVisibility then
+                        addon:ApplyDefaultBarVisibility()
+                    end
+                end,
+            },
             displayHeader = {
                 order = 1,
                 type = "header",

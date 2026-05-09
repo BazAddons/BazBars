@@ -76,5 +76,31 @@ function BazBars.DefaultBarData(id)
         mouseoverFade = false,
         mouseoverAlpha = 0.3,
         rightClickSelfCast = false,
+        endcaps = "off",   -- "off" / "alliance" / "horde"
+        -- false: endcaps are sized to a single button row regardless
+        -- of how many rows the bar has (Blizzard MainActionBar look).
+        -- true: endcaps scale with the full bar height (oversize for
+        -- multi-row bars).
+        endcapsAutoScale = false,
+        -- Endcap size multiplier (applied to fixed-size mode only).
+        -- 1.0 = default size; user-adjustable via the slider in the
+        -- bar's edit-mode popup.
+        endcapsScale = 1.0,
     }
 end
+
+---------------------------------------------------------------------------
+-- Endcap atlas tables (Alliance gryphons, Horde wyverns) - same atlases
+-- Blizzard's MainActionBar uses for its native endcaps.
+---------------------------------------------------------------------------
+
+BazBars.ENDCAP_ATLASES = {
+    alliance = {
+        left  = "UI-HUD-ActionBar-Gryphon-Left",
+        right = "UI-HUD-ActionBar-Gryphon-Right",
+    },
+    horde = {
+        left  = "UI-HUD-ActionBar-Wyvern-Left",
+        right = "UI-HUD-ActionBar-Wyvern-Right",
+    },
+}

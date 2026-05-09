@@ -21,6 +21,18 @@ local addon = BazCore:RegisterAddon("BazBars", {
         tooltipAnchor = "default",  -- "default" = bottom-right corner, "button" = next to button
         showKeybindText = true,
         showMacroNames = true,
+        -- When true: reparent Blizzard's MainActionBar (Bar 1
+        -- container) to a hidden carrier so the visible buttons +
+        -- chrome + endcaps all disappear. Keybinds still fire on
+        -- whatever's slotted in those positions; only the visible
+        -- UI is hidden. Edit Mode covers Bars 2-8 already; this
+        -- option fills the gap for Bar 1.
+        hideDefaultActionBar = false,
+        -- When true: hide just the chrome art (border frame +
+        -- gryphon/wyvern endcaps) on Bar 1, leaving the buttons
+        -- visible and functional. Independent of hideDefaultActionBar
+        -- (bar-hide is a superset that wins automatically).
+        hideDefaultActionBarArt = false,
     },
 
     -- Slash commands
@@ -282,6 +294,125 @@ addon.config.onLoad = function(self)
 end
 
 ---------------------------------------------------------------------------
+-- Hide Blizzard's default action bar (Bar 1 + endcap art)
+---------------------------------------------------------------------------
+--
+-- Blizzard's Edit Mode lets users hide Bars 2-8, but Bar 1 (the main
+-- action bar with slots 1-12 + the gryphon endcap chrome) cannot be
+-- hidden through Edit Mode. Most BazBars users move all their
+-- abilities onto BazBars buttons and want the default Bar 1 chrome
+-- gone.
+--
+-- Reparenting a secure frame is blocked during combat. ApplyDefault-
+-- BarHidden() bails out cleanly with a queued state if called in
+-- combat; PLAYER_REGEN_ENABLED re-runs the queued change once we're
+-- safe again. Out-of-combat toggling is fully live - no /reload
+-- required either way.
+---------------------------------------------------------------------------
+
+local hiddenParent
+local function GetHiddenParent()
+    if not hiddenParent then
+        hiddenParent = CreateFrame("Frame")
+        hiddenParent:Hide()
+    end
+    return hiddenParent
+end
+
+-- Two independent toggles:
+--
+--   ART  - hide just the chrome (BorderArt + EndCaps gryphons /
+--          wyverns). These are textures + a child frame; SetShown
+--          handles them with no taint or combat restrictions.
+--
+--   BAR  - reparent the whole MainActionBar (containers + buttons +
+--          art) to a hidden carrier and unregister its events. This
+--          is combat-protected (deferred to PLAYER_REGEN_ENABLED if
+--          called in combat). Restoring after a hide leaves Blizzard's
+--          event list cleared until the next /reload, but the visible
+--          state is restored live.
+--
+-- BAR-hide is a superset of ART-hide. When BAR is on, ART's value is
+-- moot (everything is invisible anyway).
+---------------------------------------------------------------------------
+
+local function SetBlizzardArtShown(show)
+    local bar = _G.MainActionBar
+    if not bar then return end
+    if bar.BorderArt then bar.BorderArt:SetShown(show) end
+    if bar.EndCaps   then bar.EndCaps:SetShown(show)   end
+end
+
+local function HideOne(f, hidden)
+    if not f then return end
+    if f._bbOriginalParent then return end   -- already hidden
+    f._bbOriginalParent = f:GetParent() or _G.UIParent
+    f._bbWasShown      = f:IsShown()
+    f:SetParent(hidden)
+    f:Hide()
+end
+
+local function RestoreOne(f)
+    if not f or not f._bbOriginalParent then return end
+    f:SetParent(f._bbOriginalParent)
+    if f._bbWasShown then f:Show() else f:Hide() end
+    f._bbOriginalParent = nil
+    f._bbWasShown      = nil
+end
+
+local function HideMainActionBar(hidden)
+    local bar = _G.MainActionBar
+    if not bar then return end
+    HideOne(bar, hidden)
+    if not bar._bbEventsCleared then
+        bar:UnregisterAllEvents()
+        bar._bbEventsCleared = true
+    end
+end
+
+local function ShowMainActionBar()
+    local bar = _G.MainActionBar
+    if not bar then return false end
+    local needsReload = bar._bbEventsCleared and true or false
+    RestoreOne(bar)
+    return needsReload
+end
+
+function addon:ApplyDefaultBarVisibility()
+    local p = addon.db and addon.db.profile
+    if not p then return end
+    local hideBar = p.hideDefaultActionBar    == true
+    local hideArt = p.hideDefaultActionBarArt == true
+
+    if InCombatLockdown() then
+        addon._pendingBlizzardBarVisibility = { bar = hideBar, art = hideArt }
+        if self.Print then
+            self:Print("Cannot toggle Blizzard bar visibility during combat. Will apply when combat ends.")
+        end
+        return false
+    end
+
+    if hideBar then
+        HideMainActionBar(GetHiddenParent())
+        -- Art toggle is moot - bar is hidden so children are too.
+    else
+        local needsReload = ShowMainActionBar()
+        -- Bar visible: apply art toggle independently.
+        SetBlizzardArtShown(not hideArt)
+        if needsReload and self.Print then
+            self:Print("Default action bar restored. /reload to fully restore Blizzard's bar event handling.")
+        end
+    end
+    return true
+end
+
+-- Back-compat alias used by onReady wiring (just runs the apply pass
+-- with whatever the saved state already is).
+function addon:HideDefaultActionBar()
+    self:ApplyDefaultBarVisibility()
+end
+
+---------------------------------------------------------------------------
 -- First-run CVar warning
 -- If the player has "cast on key down" enabled, dragging BazBars buttons
 -- would also fire the cast (mousedown triggers the secure click before drag
@@ -314,6 +445,15 @@ end
 
 addon.config.onReady = function(self)
     self.Bar:LoadAll()
+    self:HideDefaultActionBar()   -- no-op unless the option is set
+    -- Re-apply any pending default-bar visibility toggle once combat
+    -- ends. Setter just stashes the desired state if called in combat.
+    self:On("PLAYER_REGEN_ENABLED", function()
+        if addon._pendingBlizzardBarVisibility then
+            addon._pendingBlizzardBarVisibility = nil
+            addon:ApplyDefaultBarVisibility()
+        end
+    end)
 
     -- Targeted updates - only run the sub-update each event actually
     -- needs, instead of the full 8-function UpdateButton for every

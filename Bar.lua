@@ -52,6 +52,10 @@ function Bar:Create(barData)
     -- Layout buttons
     Bar:LayoutButtons(frame, barData)
 
+    -- Endcap textures (Alliance gryphon / Horde wyvern). Has to run
+    -- after LayoutButtons so the frame's height is known for sizing.
+    Bar:ApplyEndcaps(frame)
+
     -- Position: restore saved or default
     Bar:RestorePosition(frame, barData)
 
@@ -397,6 +401,38 @@ function Bar:RegisterEditMode(frame, barData)
                   addon.db.profile.bars[bd.id].mouseoverFade = v
                   Bar:ApplyMouseoverFade(frame)
               end },
+            { type = "dropdown", key = "endcaps", label = "Side Endcaps", section = "Appearance",
+              options = {
+                  { label = "None",             value = "off"      },
+                  { label = "Alliance Gryphons", value = "alliance" },
+                  { label = "Horde Wyverns",     value = "horde"    },
+              },
+              get = function() return BazBars.GetBarSetting(bd, "endcaps") or "off" end,
+              set = function(v)
+                  bd.endcaps = v
+                  addon.db.profile.bars[bd.id].endcaps = v
+                  Bar:ApplyEndcaps(frame)
+              end },
+            { type = "checkbox", key = "endcapsAutoScale",
+              label = "Scale Endcaps with Bar Height", section = "Appearance",
+              get = function() return BazBars.GetBarSetting(bd, "endcapsAutoScale") or false end,
+              set = function(v)
+                  bd.endcapsAutoScale = v
+                  addon.db.profile.bars[bd.id].endcapsAutoScale = v
+                  Bar:ApplyEndcaps(frame)
+              end },
+            { type = "slider", key = "endcapsScale",
+              label = "Endcap Size", section = "Appearance",
+              min = 50, max = 200, step = 5,
+              format = function(v) return math.floor(v + 0.5) .. "%" end,
+              get = function()
+                  return (BazBars.GetBarSetting(bd, "endcapsScale") or 1.0) * 100
+              end,
+              set = function(v)
+                  bd.endcapsScale = v / 100
+                  addon.db.profile.bars[bd.id].endcapsScale = v / 100
+                  Bar:ApplyEndcaps(frame)
+              end },
             { type = "dropdown", key = "visibilityMacro", label = "Bar Visible", section = "Appearance",
               options = {
                   { label = "Always Visible", value = "" },
@@ -523,6 +559,17 @@ end
 ---------------------------------------------------------------------------
 
 function Bar:Resize(frame, newRows, newCols, newSpacing)
+    -- Resizing the bar moves its secure child buttons, which is
+    -- protected while in combat. Bail with a user-facing print so
+    -- the slider drag isn't silently lost (the next setting change
+    -- after combat ends will go through normally).
+    if InCombatLockdown() then
+        if addon and addon.Print then
+            addon:Print("Cannot resize bars during combat.")
+        end
+        return
+    end
+
     local barData = frame.barData
     local oldRows = barData.rows
     local oldCols = barData.cols
@@ -543,6 +590,9 @@ function Bar:Resize(frame, newRows, newCols, newSpacing)
     -- Re-layout (also hides buttons outside grid)
     Bar:LayoutButtons(frame, barData)
 
+    -- Bar height changed; rescale endcap textures.
+    Bar:ApplyEndcaps(frame)
+
     -- Update DB
     local db = addon.db.profile.bars[barData.id]
     if db then
@@ -557,6 +607,14 @@ end
 ---------------------------------------------------------------------------
 
 function Bar:SetScale(frame, scale)
+    -- Same combat-protection story as Resize: SetScale on a parent of
+    -- secure buttons is blocked during combat lockdown.
+    if InCombatLockdown() then
+        if addon and addon.Print then
+            addon:Print("Cannot rescale bars during combat.")
+        end
+        return
+    end
     scale = BazCore:SetScaleFromCenter(frame, scale, BazBars.MIN_SCALE, BazBars.MAX_SCALE)
     frame.barData.scale = scale
     Bar:SavePosition(frame)
@@ -736,6 +794,81 @@ function Bar:UpdateSlotArt(frame)
             end
         end
     end
+end
+
+---------------------------------------------------------------------------
+-- Endcaps
+--
+-- Optional decorative gryphon (Alliance) or wyvern (Horde) textures
+-- on the left and right sides of a bar, vertically centered. Same
+-- atlases Blizzard's MainActionBar uses for its native endcaps.
+-- Endcaps scale with the bar height so resizing the bar keeps them
+-- proportional. Lazy-created on first use; just hidden when toggled
+-- off so we don't churn texture objects.
+---------------------------------------------------------------------------
+
+local ENDCAP_HEIGHT_RATIO = 1.5   -- endcap height relative to bar height
+local ENDCAP_OVERLAP      = 9     -- pixels endcap overlaps onto the bar
+local ENDCAP_Y_OFFSET     = 5     -- pixels endcap is shifted UP from center
+
+function Bar:ApplyEndcaps(frame)
+    if not frame then return end
+    local mode = BazBars.GetBarSetting(frame.barData, "endcaps") or "off"
+
+    if mode == "off" or not BazBars.ENDCAP_ATLASES[mode] then
+        if frame.endcapLeft  then frame.endcapLeft:Hide()  end
+        if frame.endcapRight then frame.endcapRight:Hide() end
+        return
+    end
+
+    -- Holder frame at a high frame level so the endcap textures render
+    -- ABOVE the buttons (button frames inherit a level above their
+    -- parent and would otherwise occlude textures parented to the
+    -- bar frame directly).
+    if not frame.endcapHolder then
+        local holder = CreateFrame("Frame", nil, frame)
+        holder:SetAllPoints(frame)
+        holder:SetFrameLevel((frame:GetFrameLevel() or 0) + 50)
+        frame.endcapHolder = holder
+    end
+
+    if not frame.endcapLeft then
+        frame.endcapLeft = frame.endcapHolder:CreateTexture(nil, "OVERLAY")
+    end
+    if not frame.endcapRight then
+        frame.endcapRight = frame.endcapHolder:CreateTexture(nil, "OVERLAY")
+    end
+
+    local atlases   = BazBars.ENDCAP_ATLASES[mode]
+    local autoScale = BazBars.GetBarSetting(frame.barData, "endcapsAutoScale")
+    local barH      = frame:GetHeight() or 50
+    -- Scaling vs fixed: "fixed" (default) sizes the endcaps to a
+    -- single button row so multi-row bars don't get giant gryphons;
+    -- "auto" scales them to the full bar height for users who want
+    -- the endcaps to grow with the bar. The user-scale multiplier
+    -- only applies in fixed-size mode (auto-scale follows the bar
+    -- and ignores the slider).
+    local refH = autoScale and barH or BazBars.DEFAULT_BUTTON_SIZE
+    local mult = autoScale and 1.0
+        or (BazBars.GetBarSetting(frame.barData, "endcapsScale") or 1.0)
+    local size = math.max(16, refH * ENDCAP_HEIGHT_RATIO * mult)
+
+    -- Anchor to the bar frame's edges (not the holder, even though the
+    -- holder is parent) so the inset is measured against the visual
+    -- bar, not the holder.
+    frame.endcapLeft:SetAtlas(atlases.left, false)
+    frame.endcapLeft:SetSize(size, size)
+    frame.endcapLeft:ClearAllPoints()
+    frame.endcapLeft:SetPoint("RIGHT", frame, "LEFT",
+        ENDCAP_OVERLAP, ENDCAP_Y_OFFSET)
+    frame.endcapLeft:Show()
+
+    frame.endcapRight:SetAtlas(atlases.right, false)
+    frame.endcapRight:SetSize(size, size)
+    frame.endcapRight:ClearAllPoints()
+    frame.endcapRight:SetPoint("LEFT", frame, "RIGHT",
+        -ENDCAP_OVERLAP, ENDCAP_Y_OFFSET)
+    frame.endcapRight:Show()
 end
 
 
