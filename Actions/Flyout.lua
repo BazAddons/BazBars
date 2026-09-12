@@ -30,22 +30,11 @@ local Actions = BazBars.Actions
 -- Local helpers
 ---------------------------------------------------------------------------
 
-local function GetSpellName(spellID)
-    if not spellID then return nil end
-    local info = C_Spell.GetSpellInfo(spellID)
-    return info and info.name or nil
-end
-
 local function SpellIsKnown(spellID)
     if not spellID then return false end
-    if IsSpellKnownOrOverridesKnown then
-        local ok, known = pcall(IsSpellKnownOrOverridesKnown, spellID)
-        if ok and known then return true end
-    end
-    if IsSpellKnown then
-        local ok, known = pcall(IsSpellKnown, spellID)
-        if ok and known then return true end
-    end
+    -- The IsSpellKnown* globals only exist behind the loadDeprecationFallbacks
+    -- CVar since Midnight; C_SpellBook is the real API.
+    if C_SpellBook.IsSpellKnownOrInSpellBook(spellID) then return true end
     return C_Spell.GetSpellInfo(spellID) ~= nil
 end
 

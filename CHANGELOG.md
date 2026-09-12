@@ -1,28 +1,19 @@
 # BazBars Changelog
 
-## 058 — Per-bar endcaps + Bar 1 hide toggles
+## 059 — Slash commands fixed, no more range-check errors
 
-**Per-bar side endcaps.** A new "Side Endcaps" dropdown in each bar's
-Edit Mode popup adds Alliance gryphon or Horde wyvern art on the
-left and right sides of the bar (vertically centered, rendered above
-the buttons). Two extra controls go with it:
-- "Scale Endcaps with Bar Height" — off by default; on for the
-  multi-row "giant gryphons" look.
-- "Endcap Size" slider (50% – 200%) for fine-tuning when the
-  auto-scale is off.
+**`/bb` commands work again.** Every `/bb` subcommand (`create`, `export`,
+`reset` and the rest) was failing with a "nil value" error. They now run
+as intended.
 
-**Hide the default Blizzard Bar 1.** New options under General
-Settings → Blizzard UI:
-- **Hide Default Action Bar (Bar 1)** — hides Bar 1 entirely (buttons
-  + chrome + endcaps). Edit Mode covers Bars 2-8 already; this fills
-  the gap for Bar 1. Keybinds 1-12 still fire whatever's slotted on
-  those buttons.
-- **Hide Bar 1 Art Only** — hides just the gryphon/wyvern endcaps and
-  the dark border frame on Bar 1, leaving the buttons visible. Useful
-  if you still use Bar 1's slots but want the decorative chrome gone.
+**No more ADDON_ACTION_BLOCKED from item range checks.** With an item on a
+bar and a friendly target in combat (healing a party member, targeting
+yourself), BazBars tripped Blizzard's protected-call guard every range
+tick. Items now skip that check in the one case Blizzard forbids it and
+keep their normal colour. Range colouring against enemies is unchanged.
 
-Both toggles apply live (no /reload). Toggling in combat is deferred
-until combat ends.
+**Midnight API update.** Flyout spell detection now uses the current
+spellbook API instead of a compatibility function that Blizzard is
+phasing out.
 
-**Combat-safe edits.** Bar resize and rescale now bail with a print
-during combat instead of erroring with `ADDON_ACTION_BLOCKED`.
+**Marked compatible with patch 12.1.0.** The addon no longer shows as out of date in the AddOns list.

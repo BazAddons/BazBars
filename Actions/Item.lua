@@ -105,6 +105,13 @@ end
 
 function Item.isInRange(data, unit)
     if not unit or not UnitExists(unit) then return nil end
+    -- C_Item.IsItemInRange is protected in combat for non-enemy units
+    -- (10.2.0 hotfix 2023-11-16; enemies re-permitted 2023-12-11).
+    -- Calling it on a friendly target mid-combat raises
+    -- ADDON_ACTION_BLOCKED, which pcall cannot catch. Return nil
+    -- ("unknown") like the no-target case so the button keeps its
+    -- usability colour. Same guard LibRangeCheck-3.0 uses.
+    if InCombatLockdown() and not UnitCanAttack("player", unit) then return nil end
     return C_Item.IsItemInRange(data.id, unit)
 end
 

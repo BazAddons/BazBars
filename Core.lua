@@ -7,7 +7,12 @@
 -- Addon Registration via BazCore
 ---------------------------------------------------------------------------
 
-local addon = BazCore:RegisterAddon("BazBars", {
+-- Declared before the assignment so the command handlers inside the
+-- table below capture this local. Written as one statement, the
+-- closures would bind a nil global instead (local scope starts after
+-- the initializer), breaking every /bb subcommand.
+local addon
+addon = BazCore:RegisterAddon("BazBars", {
     title = "BazBars",
     savedVariable = "BazBarsDB",
     profiles = true,

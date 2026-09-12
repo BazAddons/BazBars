@@ -14,7 +14,6 @@ addon.Button = Button
 -- Localized globals for perf
 local pairs = pairs
 local InCombatLockdown = InCombatLockdown
-local GetCursorInfo = GetCursorInfo
 local ClearCursor = ClearCursor
 local IsEquippedItem = C_Item.IsEquippedItem
 local GameTooltip = GameTooltip
@@ -102,7 +101,7 @@ function Button:UpdateCooldown(btn)
     -- API. Still routes through CooldownPrototype to avoid taint on the
     -- method dispatch itself.
     if handler.getCooldown then
-        local start, duration, enable = handler.getCooldown(data)
+        local start, duration = handler.getCooldown(data)
         if start and duration and duration > 0 then
             btn.cooldown:Show()
             CooldownPrototype.SetCooldown(btn.cooldown, start, duration)
