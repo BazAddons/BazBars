@@ -360,7 +360,9 @@ function FlyoutPopup:OpenConfig(button)
                       if button._bazFlyoutPopup.SetSticky then
                           button._bazFlyoutPopup:SetSticky(false)
                       end
-                      button._bazFlyoutPopup:Hide()
+                      -- SafeHide defers in combat (BazCore 121+); older cores hide directly.
+                      local p = button._bazFlyoutPopup
+                      if p.SafeHide then p:SafeHide() else p:Hide() end
                   end
               end },
             { label = "Apply", style = "primary",
@@ -373,7 +375,9 @@ function FlyoutPopup:OpenConfig(button)
                       if button._bazFlyoutPopup.SetSticky then
                           button._bazFlyoutPopup:SetSticky(false)
                       end
-                      button._bazFlyoutPopup:Hide()
+                      -- SafeHide defers in combat (BazCore 121+); older cores hide directly.
+                      local p = button._bazFlyoutPopup
+                      if p.SafeHide then p:SafeHide() else p:Hide() end
                   end
               end },
         },
@@ -392,7 +396,9 @@ function FlyoutPopup:OpenConfig(button)
                     if button._bazFlyoutPopup.SetSticky then
                         button._bazFlyoutPopup:SetSticky(false)
                     end
-                    button._bazFlyoutPopup:Hide()
+                    -- SafeHide defers in combat (BazCore 121+); older cores hide directly.
+                    local p = button._bazFlyoutPopup
+                    if p.SafeHide then p:SafeHide() else p:Hide() end
                 end
             end
         end,
